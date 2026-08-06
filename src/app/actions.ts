@@ -12,6 +12,7 @@ import {
   summitRegistrationSchema,
   type RegistrationValues,
 } from "@/lib/summit/validation";
+import { encodeSummitPreferences } from "@/lib/summit/preferences";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type RegistrationState = {
@@ -23,6 +24,12 @@ export type RegistrationState = {
 function formValue(formData: FormData, name: string) {
   const input = formData.get(name);
   return typeof input === "string" ? input : "";
+}
+
+function formValues(formData: FormData, name: string) {
+  return formData
+    .getAll(name)
+    .filter((value): value is string => typeof value === "string");
 }
 
 function normalizedPhone(value: string) {
@@ -55,6 +62,8 @@ export async function submitRegistration(
     profession: formValue(formData, "profession"),
     designation: formValue(formData, "designation"),
     place: formValue(formData, "place"),
+    participation_purpose: formValue(formData, "participation_purpose"),
+    meeting_requests: formValues(formData, "meeting_requests"),
     summit_expectations: formValue(formData, "summit_expectations"),
     website: formValue(formData, "website"),
   };
@@ -72,6 +81,8 @@ export async function submitRegistration(
       profession: fieldErrors.profession,
       designation: fieldErrors.designation,
       place: fieldErrors.place,
+      participation_purpose: fieldErrors.participation_purpose,
+      meeting_requests: fieldErrors.meeting_requests,
       summit_expectations: fieldErrors.summit_expectations,
     };
     const values: RegistrationValues = {
@@ -83,6 +94,8 @@ export async function submitRegistration(
       profession: submittedValues.profession,
       designation: submittedValues.designation,
       place: submittedValues.place,
+      participation_purpose: submittedValues.participation_purpose,
+      meeting_requests: submittedValues.meeting_requests,
       summit_expectations: submittedValues.summit_expectations,
     };
 
@@ -121,6 +134,8 @@ export async function submitRegistration(
     profession: parsed.data.profession,
     designation: parsed.data.designation,
     place: parsed.data.place,
+    participation_purpose: parsed.data.participation_purpose,
+    meeting_requests: parsed.data.meeting_requests,
     summit_expectations: parsed.data.summit_expectations,
   };
 
@@ -159,7 +174,11 @@ export async function submitRegistration(
     p_profession: registration.profession,
     p_designation: registration.designation,
     p_place: registration.place,
-    p_summit_expectations: registration.summit_expectations || null,
+    p_summit_expectations: encodeSummitPreferences({
+      purpose: registration.participation_purpose,
+      meetings: registration.meeting_requests,
+      notes: registration.summit_expectations,
+    }),
     p_checkout_token: editableToken,
   });
 

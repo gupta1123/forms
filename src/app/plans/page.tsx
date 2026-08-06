@@ -96,16 +96,28 @@ export default async function PlansPage({
               <div className="summit-pass-main">
                 <span className="summit-pass-badge">
                   <PiSealCheck aria-hidden="true" />
-                  Full summit access
+                  Full-day access
                 </span>
                 <h3>{checkout.plan_name}</h3>
-                <p className="summit-pass-description">{checkout.plan_description}</p>
+                <p className="summit-pass-description">
+                  Delegate access to every session, meeting track and the
+                  networking programme.
+                </p>
 
                 <ul className="summit-feature-list">
-              <PlanFeature>Registration for the Investment Summit</PlanFeature>
-                  <PlanFeature>All summit sessions and networking programme</PlanFeature>
+                  <PlanFeature>
+                    Inaugural session and the Jalna opportunity presentation
+                  </PlanFeature>
+                  <PlanFeature>
+                    All sector opportunity tracks and policy sessions
+                  </PlanFeature>
+                  <PlanFeature>
+                    Pre-scheduled B2B and B2G meeting slots you requested
+                  </PlanFeature>
+                  <PlanFeature>
+                    Networking lunch and the investor delegate directory
+                  </PlanFeature>
                   <PlanFeature>GST included in the displayed price</PlanFeature>
-                  <PlanFeature>Secure Razorpay checkout</PlanFeature>
                 </ul>
 
                 <div className="summit-redeem">

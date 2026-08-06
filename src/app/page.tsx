@@ -12,6 +12,7 @@ import {
   isCheckoutToken,
 } from "@/lib/summit/constants";
 import type { RegistrationValues } from "@/lib/summit/validation";
+import { registrationValuesFromStored } from "@/lib/summit/preferences";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { redirect } from "next/navigation";
 
@@ -36,7 +37,10 @@ export default async function RegistrationPage() {
       const { data } = await supabase.rpc("get_summit_registration", {
         p_checkout_token: checkoutToken,
       });
-      initialValues = Array.isArray(data) && data[0] ? data[0] : null;
+      initialValues =
+        Array.isArray(data) && data[0]
+          ? registrationValuesFromStored(data[0])
+          : null;
     }
   }
 
@@ -49,7 +53,8 @@ export default async function RegistrationPage() {
             accent="attending?"
             description={
               <>
-                These details help us prepare your registration. Fields marked
+                This is what goes on your badge and helps the organisers route
+                your meeting requests. Fields marked
                 <span className="summit-required">*</span> are required.
               </>
             }

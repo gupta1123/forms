@@ -1,12 +1,17 @@
 "use client";
 
 import { useActionState } from "react";
-import { PiArrowRight } from "react-icons/pi";
+import { PiArrowRight, PiCaretDown } from "react-icons/pi";
 
 import {
   submitRegistration,
   type RegistrationState,
 } from "@/app/actions";
+import {
+  MEETING_OPTIONS,
+  PARTICIPATION_PURPOSES,
+  SECTOR_OPTIONS,
+} from "@/lib/summit/preferences";
 import type { RegistrationValues } from "@/lib/summit/validation";
 
 const emptyValues: RegistrationValues = {
@@ -18,6 +23,8 @@ const emptyValues: RegistrationValues = {
   profession: "",
   designation: "",
   place: "",
+  participation_purpose: "",
+  meeting_requests: [],
   summit_expectations: "",
 };
 
@@ -86,20 +93,13 @@ export function RegistrationForm({
       </fieldset>
 
       <fieldset className="summit-fieldset">
-        <legend className="summit-legend">Professional details</legend>
+        <legend className="summit-legend">Organisation</legend>
         <div className="summit-field-grid">
           <Field
-            label="Industry"
-            name="industry"
-            autoComplete="organization"
-            placeholder="e.g. Financial Services"
-            defaultValue={values.industry}
-            errors={state.errors?.industry}
-          />
-          <Field
-            label="Profession"
+            label="Organisation"
             name="profession"
-            placeholder="e.g. Investment Advisor"
+            autoComplete="organization"
+            placeholder="Company or institution"
             defaultValue={values.profession}
             errors={state.errors?.profession}
           />
@@ -111,8 +111,16 @@ export function RegistrationForm({
             defaultValue={values.designation}
             errors={state.errors?.designation}
           />
+          <SelectField
+            label="Sector"
+            name="industry"
+            placeholder="Select your sector"
+            options={SECTOR_OPTIONS}
+            defaultValue={values.industry}
+            errors={state.errors?.industry}
+          />
           <Field
-            label="Place"
+            label="City"
             name="place"
             autoComplete="address-level2"
             placeholder="City, State"
@@ -124,31 +132,78 @@ export function RegistrationForm({
 
       <fieldset className="summit-fieldset">
         <legend className="summit-legend">What you want from the day</legend>
-        <div>
-          <div className="mb-2 flex items-baseline gap-4">
-            <label className="field-label mb-0" htmlFor="summit_expectations">
-              What would make this summit valuable for you?
-            </label>
-            <span className="summit-optional">Optional</span>
+        <div className="summit-field-grid">
+          <div className="summit-field-full">
+            <SelectField
+              label="Purpose of participation"
+              name="participation_purpose"
+              placeholder="Select a purpose"
+              options={PARTICIPATION_PURPOSES}
+              defaultValue={values.participation_purpose}
+              errors={state.errors?.participation_purpose}
+            />
           </div>
-          <p className="summit-field-hint mb-3">
-            Share the insights, connections, or opportunities you are hoping to
-            take away from the summit.
-          </p>
-          <textarea
-            className="field-textarea"
-            id="summit_expectations"
-            name="summit_expectations"
-            maxLength={2000}
-            rows={5}
-            placeholder="Tell us what would make this summit valuable for you..."
-            defaultValue={values.summit_expectations}
-          />
-          {state.errors?.summit_expectations?.map((error) => (
-            <p className="summit-error" key={error}>
-              {error}
+
+          <div className="summit-field-full">
+            <div className="summit-field-label-row">
+              <span className="field-label mb-0">
+                Meetings you&apos;d like us to arrange
+              </span>
+              <span className="summit-optional">Optional</span>
+            </div>
+            <p className="summit-field-hint mb-3">
+              Requests are matched before the summit so the organisers can
+              prepare a useful slot for you.
             </p>
-          ))}
+            <div className="summit-option-grid">
+              {MEETING_OPTIONS.map((option) => (
+                <label className="summit-option-card" key={option.value}>
+                  <input
+                    defaultChecked={values.meeting_requests.includes(option.value)}
+                    name="meeting_requests"
+                    type="checkbox"
+                    value={option.value}
+                  />
+                  <span>
+                    {option.label}
+                    <small>{option.description}</small>
+                  </span>
+                </label>
+              ))}
+            </div>
+            {state.errors?.meeting_requests?.map((error) => (
+              <p className="summit-error" key={error}>
+                {error}
+              </p>
+            ))}
+          </div>
+
+          <div className="summit-field-full">
+            <div className="summit-field-label-row">
+              <label className="field-label mb-0" htmlFor="summit_expectations">
+                Anything the organisers should know
+              </label>
+              <span className="summit-optional">Optional</span>
+            </div>
+            <p className="summit-field-hint mb-3">
+              Share land requirements, sector specifics, or people you would
+              particularly like to meet.
+            </p>
+            <textarea
+              className="field-textarea"
+              id="summit_expectations"
+              name="summit_expectations"
+              maxLength={1200}
+              rows={5}
+              placeholder="Tell us what would make this summit valuable for you..."
+              defaultValue={values.summit_expectations}
+            />
+            {state.errors?.summit_expectations?.map((error) => (
+              <p className="summit-error" key={error}>
+                {error}
+              </p>
+            ))}
+          </div>
         </div>
       </fieldset>
 
@@ -212,6 +267,54 @@ function Field({
         required
       />
       {hint && <p className="summit-field-hint">{hint}</p>}
+      {errors?.map((error) => (
+        <p className="summit-error" id={`${name}-error`} key={error}>
+          {error}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  placeholder,
+  options,
+  defaultValue,
+  errors,
+}: {
+  label: string;
+  name: keyof RegistrationValues;
+  placeholder: string;
+  options: readonly string[];
+  defaultValue: string;
+  errors?: string[];
+}) {
+  return (
+    <div>
+      <label className="field-label" htmlFor={name}>
+        {label} <span className="summit-required">*</span>
+      </label>
+      <div className="summit-select-wrap">
+        <select
+          aria-describedby={errors?.length ? `${name}-error` : undefined}
+          aria-invalid={Boolean(errors?.length)}
+          className="field-input field-select"
+          defaultValue={defaultValue}
+          id={name}
+          name={name}
+          required
+        >
+          <option value="">{placeholder}</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <PiCaretDown aria-hidden="true" />
+      </div>
       {errors?.map((error) => (
         <p className="summit-error" id={`${name}-error`} key={error}>
           {error}

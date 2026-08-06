@@ -17,14 +17,18 @@ export const summitRegistrationSchema = z.object({
     .max(30, "Enter a valid phone number.")
     .regex(/^[0-9+() .-]+$/, "Enter a valid phone number."),
   email: z.string().trim().email("Enter a valid email address.").max(320),
-  industry: requiredText("Industry"),
-  profession: requiredText("Profession"),
+  industry: requiredText("Sector"),
+  profession: requiredText("Organisation"),
   designation: requiredText("Designation"),
-  place: requiredText("Place"),
+  place: requiredText("City"),
+  participation_purpose: requiredText("Purpose of participation", 180),
+  meeting_requests: z
+    .array(z.string().trim().min(1).max(100))
+    .max(4, "Select no more than four meeting requests."),
   summit_expectations: z
     .string()
     .trim()
-    .max(2000, "Please keep your response within 2,000 characters."),
+    .max(1200, "Please keep your response within 1,200 characters."),
   website: z.string().max(0).optional(),
 });
 

@@ -31,6 +31,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -39,6 +40,7 @@ body {
   font-family: var(--font-hanken-grotesk), "Helvetica Neue", Arial, sans-serif;
   font-size: 16.5px;
   line-height: 1.68;
+  overflow-x: clip;
 }
 
 button,
@@ -98,7 +100,8 @@ textarea {
   }
 
   .field-input,
-  .field-textarea {
+  .field-textarea,
+  .field-select {
     @apply w-full outline-none transition;
     background: var(--paper);
     border: 1.5px solid var(--ink-16);
@@ -129,17 +132,38 @@ textarea {
   }
 
   .field-input:focus,
-  .field-textarea:focus {
+  .field-textarea:focus,
+  .field-select:focus {
     background: #fff;
     border-color: var(--navy);
     box-shadow: 0 0 0 3px rgb(28 63 94 / 13%);
   }
 
   .field-input[aria-invalid="true"],
-  .field-textarea[aria-invalid="true"] {
+  .field-textarea[aria-invalid="true"],
+  .field-select[aria-invalid="true"] {
     background: rgb(168 66 44 / 5%);
     border-color: var(--error);
   }
+}
+
+.field-select {
+  appearance: none;
+  padding-right: 38px;
+}
+
+.summit-select-wrap {
+  position: relative;
+}
+
+.summit-select-wrap > svg {
+  color: var(--ink-72);
+  font-size: 14px;
+  pointer-events: none;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .summit-app {
@@ -252,6 +276,18 @@ textarea {
   grid-template-columns: 340px minmax(0, 1fr);
   margin: clamp(30px, 4vw, 58px) auto clamp(60px, 7vw, 96px);
   width: min(1180px, 92vw);
+}
+
+.summit-shell > *,
+.summit-panel,
+.summit-panel-head,
+.summit-panel-body,
+.summit-fieldset,
+.summit-field-grid,
+.summit-field-grid > *,
+.summit-option-grid,
+.summit-option-grid > * {
+  min-width: 0;
 }
 
 .summit-sidebar {
@@ -519,6 +555,66 @@ textarea {
   display: grid;
   gap: 18px;
   grid-template-columns: 1fr 1fr;
+}
+
+.summit-field-full {
+  grid-column: 1 / -1;
+}
+
+.summit-field-label-row {
+  align-items: baseline;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.summit-option-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.summit-option-card {
+  align-items: flex-start;
+  background: var(--paper);
+  border: 1.5px solid var(--ink-16);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  min-height: 76px;
+  padding: 14px 15px;
+  transition: background 160ms, border-color 160ms, box-shadow 160ms;
+}
+
+.summit-option-card:hover {
+  border-color: rgb(20 32 43 / 34%);
+}
+
+.summit-option-card:has(input:checked) {
+  background: #fff;
+  border-color: var(--navy);
+  box-shadow: 3px 3px 0 var(--navy);
+}
+
+.summit-option-card input {
+  accent-color: var(--navy);
+  flex: none;
+  height: 17px;
+  margin: 3px 0 0;
+  width: 17px;
+}
+
+.summit-option-card span {
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.summit-option-card small {
+  color: var(--ink-48);
+  display: block;
+  font-size: 12.5px;
+  margin-top: 2px;
 }
 
 .summit-field-hint {
@@ -912,7 +1008,13 @@ textarea {
   }
 
   .summit-header-inner {
+    gap: 10px;
     height: 68px;
+    width: calc(100% - 32px);
+  }
+
+  .summit-brand {
+    min-width: 0;
   }
 
   .summit-brand img {
@@ -921,7 +1023,10 @@ textarea {
   }
 
   .summit-brand strong {
-    font-size: 18px;
+    font-size: 17px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .summit-secure span,
@@ -930,11 +1035,41 @@ textarea {
   }
 
   .summit-secure {
+    flex: none;
     padding: 9px;
   }
 
+  .summit-shell {
+    gap: 24px;
+    margin-bottom: 54px;
+    margin-top: 24px;
+    width: calc(100% - 32px);
+  }
+
+  .summit-sidebar h1 {
+    font-size: clamp(30px, 9vw, 36px);
+  }
+
+  .summit-sidebar-copy {
+    font-size: 15px;
+  }
+
+  .summit-panel {
+    box-shadow: 5px 6px 0 var(--navy);
+    max-width: 100%;
+  }
+
+  .summit-panel-head {
+    padding: 24px 18px 0;
+  }
+
+  .summit-panel-body {
+    padding: 22px 18px 26px;
+  }
+
   .summit-field-grid,
-  .summit-confirmation-grid {
+  .summit-confirmation-grid,
+  .summit-option-grid {
     grid-template-columns: 1fr;
   }
 
@@ -958,6 +1093,7 @@ textarea {
 
   .summit-actions .button-primary,
   .summit-actions .button-secondary {
+    min-width: 0;
     width: 100%;
   }
 
@@ -969,6 +1105,7 @@ textarea {
   .summit-footer-inner {
     align-items: flex-start;
     flex-direction: column;
+    width: calc(100% - 32px);
   }
 }
 

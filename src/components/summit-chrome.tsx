@@ -95,20 +95,23 @@ export function SummitSidebar({
           Date & venue
         </p>
         <p>
-          <strong>Announcing soon.</strong> The summit date and venue are being
-          finalised with the organising partners.
+          <strong>Thursday, 3 September 2026</strong>
+          <br />
+          Jalna, Maharashtra · 09:00–14:07, followed by a networking lunch and
+          a dry port site visit.
         </p>
         <p>
-          Registered delegates are notified first by email, before any public
-          announcement.
+          <strong>Venue announcing soon.</strong> Registered delegates are
+          notified first by email, before any public announcement.
         </p>
       </div>
 
       <div className="summit-privacy">
         <strong>Your details stay private</strong>
         <p>
-          Registration records are used only for summit access and payment.
-          They are not exposed through any public API.
+          Registration records are used only for summit access, badge printing,
+          payment, and the meetings you request. They are not exposed through
+          any public API.
         </p>
       </div>
     </aside>

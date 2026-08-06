@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { decodeSummitPreferences } from "@/lib/summit/preferences";
+
 export type AdminRegistration = {
   application_id: number;
   first_name: string;
@@ -66,6 +68,7 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
           registration.profession,
           registration.designation,
           registration.place,
+          decodeSummitPreferences(registration.summit_expectations).purpose,
           registration.redeem_code ?? "",
         ].some((value) => value.toLowerCase().includes(normalizedSearch));
 
@@ -122,8 +125,8 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
               <tr className="border-b border-[#ebe8ed] bg-[#faf9fb] text-xs font-semibold uppercase tracking-[0.08em] text-[#89828e]">
                 <th className="px-5 py-3.5">Attendee</th>
                 <th className="px-5 py-3.5">Contact</th>
-                <th className="px-5 py-3.5">Professional details</th>
-                <th className="px-5 py-3.5">Place</th>
+                <th className="px-5 py-3.5">Organisation</th>
+                <th className="px-5 py-3.5">City</th>
                 <th className="px-5 py-3.5">Redeem code</th>
                 <th className="px-5 py-3.5">Amount</th>
                 <th className="px-5 py-3.5">Payment</th>
@@ -151,19 +154,28 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
 }
 
 function RegistrationRow({ registration }: { registration: AdminRegistration }) {
+  const preferences = decodeSummitPreferences(registration.summit_expectations);
+  const hasPreferences = Boolean(
+    preferences.purpose || preferences.meetings.length || preferences.notes,
+  );
+
   return (
     <tr className="border-b border-[#efecf0] align-top text-sm last:border-0 hover:bg-[#fcfbfd]">
       <td className="px-5 py-4">
         <p className="font-semibold text-[#332e37]">{registration.first_name} {registration.last_name}</p>
-        {registration.summit_expectations && (
+        {hasPreferences && (
           <details className="mt-2 max-w-48 text-xs text-[#746a79]">
-            <summary className="cursor-pointer font-medium text-[#6c3d72]">Summit expectations</summary>
-            <p className="mt-2 whitespace-pre-wrap leading-5">{registration.summit_expectations}</p>
+            <summary className="cursor-pointer font-medium text-[#6c3d72]">Summit preferences</summary>
+            <div className="mt-2 space-y-2 leading-5">
+              {preferences.purpose && <p><strong>Purpose:</strong> {preferences.purpose}</p>}
+              {preferences.meetings.length > 0 && <p><strong>Meetings:</strong> {preferences.meetings.join(" · ")}</p>}
+              {preferences.notes && <p className="whitespace-pre-wrap"><strong>Notes:</strong> {preferences.notes}</p>}
+            </div>
           </details>
         )}
       </td>
       <td className="px-5 py-4 text-[#625c66]"><p>{registration.email}</p><p className="mt-1">{registration.phone}</p></td>
-      <td className="px-5 py-4"><p className="font-medium text-[#464049]">{registration.designation}</p><p className="mt-1 text-[#77717a]">{registration.profession} · {registration.industry}</p></td>
+      <td className="px-5 py-4"><p className="font-medium text-[#464049]">{registration.profession}</p><p className="mt-1 text-[#77717a]">{registration.designation} · {registration.industry}</p></td>
       <td className="px-5 py-4 text-[#625c66]">{registration.place}</td>
       <td className="px-5 py-4">{registration.redeem_code ? <span className="rounded-full bg-[#fbf1e4] px-2.5 py-1 text-xs font-semibold text-[#956026]">{registration.redeem_code}</span> : <span className="text-xs text-[#9a949e]">Standard</span>}</td>
       <td className="px-5 py-4"><p className="font-semibold text-[#3c3640]">{formatRupees(registration.amount_due_paise)}</p>{registration.discount_amount_paise > 0 && <p className="mt-1 text-xs text-[#3f8055]">Saved {formatRupees(registration.discount_amount_paise)}</p>}</td>
