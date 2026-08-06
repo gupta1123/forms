@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PiDownloadSimple, PiSpinnerGap } from "react-icons/pi";
 
+import { exportRegistrationsToExcel } from "@/lib/admin/export-registrations";
 import { decodeSummitPreferences } from "@/lib/summit/preferences";
 
 export type AdminRegistration = {
@@ -52,6 +54,9 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
   const [search, setSearch] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("all");
   const [codeUsage, setCodeUsage] = useState("all");
+  const [sortOrder, setSortOrder] = useState<"recent" | "oldest">("recent");
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
 
   const filteredRegistrations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -86,8 +91,25 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
         (codeUsage === "standard" && !registration.redeem_code);
 
       return matchesSearch && matchesPayment && matchesCode;
+    }).sort((left, right) => {
+      const difference =
+        new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
+      return sortOrder === "recent" ? difference : -difference;
     });
-  }, [codeUsage, data.registrations, paymentStatus, search]);
+  }, [codeUsage, data.registrations, paymentStatus, search, sortOrder]);
+
+  async function handleExport() {
+    setExporting(true);
+    setExportError("");
+
+    try {
+      await exportRegistrationsToExcel(filteredRegistrations);
+    } catch {
+      setExportError("The Excel file could not be created. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  }
 
   const total = data.metrics.total_registrations;
 
@@ -97,9 +119,9 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
               <h2 className="text-lg font-semibold tracking-[-0.02em] text-[#302a36]">Registration details</h2>
-              <p className="mt-1 text-sm text-[#817b86]">Showing {filteredRegistrations.length} of {total} registrations</p>
+              <p className="mt-1 text-sm text-[#817b86]">Showing {filteredRegistrations.length} of {total} registrations · {sortOrder === "recent" ? "recent first" : "oldest first"}</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-[minmax(220px,1fr)_170px_160px]">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_170px_160px_160px_auto]">
               <label className="sr-only" htmlFor="admin-search">Search registrations</label>
               <input className="field-input h-10" id="admin-search" type="search" placeholder="Search name, email, phone..." value={search} onChange={(event) => setSearch(event.target.value)} />
               <label className="sr-only" htmlFor="payment-filter">Payment status</label>
@@ -115,8 +137,18 @@ export function AdminDashboard({ data }: { data: AdminDashboardData }) {
                 <option value="redeemed">Code applied</option>
                 <option value="standard">Standard price</option>
               </select>
+              <label className="sr-only" htmlFor="sort-order">Sort order</label>
+              <select className="field-input h-10" id="sort-order" value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "recent" | "oldest")}>
+                <option value="recent">Recent first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+              <button className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#6c3d72] px-4 text-sm font-semibold text-white transition hover:bg-[#57315c] disabled:cursor-wait disabled:opacity-60" type="button" onClick={handleExport} disabled={exporting}>
+                {exporting ? <PiSpinnerGap aria-hidden="true" className="animate-spin" /> : <PiDownloadSimple aria-hidden="true" />}
+                {exporting ? "Preparing..." : "Export Excel"}
+              </button>
             </div>
           </div>
+          {exportError && <p className="mt-3 text-sm text-[#a8422c]" role="alert">{exportError}</p>}
         </div>
 
         <div className="overflow-x-auto">
