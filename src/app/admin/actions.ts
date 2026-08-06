@@ -38,7 +38,6 @@ export async function adminSignIn(
   const localUsername = process.env.LOCAL_ADMIN_USERNAME;
   const isLocalUsername = parsed.data.identifier === localUsername;
   const isValidLocalAlias =
-    process.env.NODE_ENV === "development" &&
     isLocalUsername &&
     parsed.data.password === process.env.LOCAL_ADMIN_PASSWORD &&
     Boolean(process.env.LOCAL_ADMIN_SUPABASE_EMAIL) &&
