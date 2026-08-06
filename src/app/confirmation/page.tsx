@@ -1,0 +1,187 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { PiCheck } from "react-icons/pi";
+
+import { startAnotherRegistration } from "@/app/confirmation/actions";
+import { SiteFooter } from "@/components/site-footer";
+import { SummitHeader, SummitShell } from "@/components/summit-chrome";
+import {
+  CHECKOUT_COOKIE_NAME,
+  isCheckoutToken,
+} from "@/lib/summit/constants";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Registration Confirmed | Jalna Investment Summit",
+  description: "Your Jalna Investment Summit registration confirmation.",
+  robots: { index: false, follow: false },
+};
+
+type Application = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  amount_due_paise: number;
+  status: "details_submitted" | "payment_pending" | "paid" | "cancelled";
+  paid_at: string | null;
+  plan_id: number;
+  redeem_code_id: number | null;
+};
+
+type PaymentOrder = {
+  id: number;
+  provider_order_id: string | null;
+  amount_paise: number;
+  key_mode: "test" | "live";
+};
+
+export default async function ConfirmationPage() {
+  const cookieStore = await cookies();
+  const checkoutToken = cookieStore.get(CHECKOUT_COOKIE_NAME)?.value;
+  if (!isCheckoutToken(checkoutToken)) redirect("/");
+
+  const supabase = createSupabaseServiceClient();
+  const { data: applicationData } = await supabase
+    .from("summit_applications")
+    .select("id, first_name, last_name, email, amount_due_paise, status, paid_at, plan_id, redeem_code_id")
+    .eq("checkout_token", checkoutToken)
+    .maybeSingle();
+  const application = applicationData as Application | null;
+
+  if (!application) redirect("/");
+  if (application.status !== "paid") redirect("/plans");
+
+  const [{ data: plan }, { data: orderData }] = await Promise.all([
+    supabase
+      .from("summit_plans")
+      .select("name")
+      .eq("id", application.plan_id)
+      .maybeSingle(),
+    supabase
+      .from("summit_payment_orders")
+      .select("id, provider_order_id, amount_paise, key_mode")
+      .eq("application_id", application.id)
+      .eq("status", "paid")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const order = orderData as PaymentOrder | null;
+
+  const [{ data: redeemCode }, { data: attempt }] = await Promise.all([
+    application.redeem_code_id
+      ? supabase
+          .from("summit_redeem_codes")
+          .select("code_normalized")
+          .eq("id", application.redeem_code_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    order
+      ? supabase
+          .from("summit_payment_attempts")
+          .select("provider_payment_id, method, captured_at")
+          .eq("payment_order_id", order.id)
+          .eq("status", "captured")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const attendeeName = `${application.first_name} ${application.last_name}`;
+  const registrationReference = `IS-${String(application.id).padStart(6, "0")}`;
+  const paymentReference =
+    attempt?.provider_payment_id ?? order?.provider_order_id ?? "Confirmed";
+  const paidAt = attempt?.captured_at ?? application.paid_at;
+
+  return (
+    <main className="summit-app flex flex-col">
+      <SummitHeader activeStep={4} greeting={attendeeName} />
+      <SummitShell activeStep={4}>
+        <section aria-labelledby="confirmation-title" className="summit-panel">
+          <div className="summit-confirmation">
+            <span className="summit-success-icon">
+              <PiCheck aria-hidden="true" />
+            </span>
+            <p className="summit-kicker mt-5">Payment successful</p>
+            <h1 id="confirmation-title">
+              You&apos;re <em>registered.</em>
+            </h1>
+            <p className="summit-confirmation-intro">
+              Thank you, {attendeeName}. Your summit pass is confirmed and the
+              payment has been recorded.
+            </p>
+
+            <div className="summit-confirmation-card">
+              <dl className="summit-confirmation-grid">
+              <ConfirmationItem label="Registration reference" value={registrationReference} />
+              <ConfirmationItem label="Payment reference" value={paymentReference} />
+              <ConfirmationItem label="Summit pass" value={plan?.name ?? "Investment Summit Pass"} />
+              <ConfirmationItem label="Amount paid" value={formatRupees(order?.amount_paise ?? application.amount_due_paise)} />
+              <ConfirmationItem label="Registered email" value={application.email} />
+              <ConfirmationItem label="Payment method" value={formatPaymentMethod(attempt?.method)} />
+              {redeemCode?.code_normalized && (
+                <ConfirmationItem label="Redeem code" value={redeemCode.code_normalized} />
+              )}
+              {paidAt && <ConfirmationItem label="Paid on" value={formatDate(paidAt)} />}
+              </dl>
+
+              {order?.key_mode === "test" && (
+                <div className="mt-7 border border-[#be8a2c] bg-[#fff3d6] px-4 py-3 text-sm text-[#765521]">
+                  This was a Razorpay Test Mode payment. No real money was charged.
+                </div>
+              )}
+            </div>
+
+            <div className="summit-actions mx-auto max-w-[610px] justify-center">
+              <Link className="button-secondary inline-flex h-11 items-center justify-center px-5" href="/contact">
+                Contact support
+              </Link>
+              <form action={startAnotherRegistration}>
+                <button className="button-primary h-11 w-full px-5" type="submit">
+                  Register another attendee
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </SummitShell>
+
+      <SiteFooter />
+    </main>
+  );
+}
+
+function ConfirmationItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd className="break-words">{value}</dd>
+    </div>
+  );
+}
+
+function formatRupees(paise: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function formatPaymentMethod(method: string | null | undefined) {
+  if (!method) return "Razorpay";
+  return method.replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
+}
