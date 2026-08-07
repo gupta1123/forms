@@ -99,16 +99,25 @@ export function decodeSummitPreferences(
 
 type StoredRegistrationValues = Omit<
   RegistrationValues,
-  "participation_purpose" | "meeting_requests"
+  "industry_other" | "participation_purpose" | "meeting_requests"
 >;
 
 export function registrationValuesFromStored(
   stored: Partial<StoredRegistrationValues>,
 ): Partial<RegistrationValues> {
   const preferences = decodeSummitPreferences(stored.summit_expectations);
+  const storedIndustry = stored.industry?.trim() ?? "";
+  const usesListedSector = SECTOR_OPTIONS.some(
+    (sector) => sector !== "Other" && sector === storedIndustry,
+  );
 
   return {
     ...stored,
+    industry: usesListedSector ? storedIndustry : storedIndustry ? "Other" : "",
+    industry_other:
+      storedIndustry && !usesListedSector && storedIndustry !== "Other"
+        ? storedIndustry
+        : "",
     participation_purpose: preferences.purpose,
     meeting_requests: preferences.meetings,
     summit_expectations: preferences.notes,

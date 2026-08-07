@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { PiArrowRight, PiCaretDown } from "react-icons/pi";
 
 import {
@@ -19,6 +19,7 @@ const emptyValues: RegistrationValues = {
   phone: "",
   email: "",
   industry: "",
+  industry_other: "",
   profession: "",
   designation: "",
   place: "",
@@ -40,6 +41,7 @@ export function RegistrationForm({
     initialState,
   );
   const values = { ...emptyValues, ...initialValues, ...state.values };
+  const [selectedSector, setSelectedSector] = useState(values.industry);
 
   return (
     <form action={formAction} noValidate>
@@ -117,7 +119,18 @@ export function RegistrationForm({
             options={SECTOR_OPTIONS}
             defaultValue={values.industry}
             errors={state.errors?.industry}
+            onChange={setSelectedSector}
           />
+          {selectedSector === "Other" && (
+            <Field
+              label="Specify your sector"
+              name="industry_other"
+              autoComplete="off"
+              placeholder="Enter your sector"
+              defaultValue={values.industry_other}
+              errors={state.errors?.industry_other}
+            />
+          )}
           <Field
             label="City"
             name="place"
@@ -248,6 +261,7 @@ function SelectField({
   options,
   defaultValue,
   errors,
+  onChange,
 }: {
   label: string;
   name: keyof RegistrationValues;
@@ -255,6 +269,7 @@ function SelectField({
   options: readonly string[];
   defaultValue: string;
   errors?: string[];
+  onChange?: (value: string) => void;
 }) {
   return (
     <div>
@@ -269,6 +284,7 @@ function SelectField({
           defaultValue={defaultValue}
           id={name}
           name={name}
+          onChange={(event) => onChange?.(event.target.value)}
           required
         >
           <option value="">{placeholder}</option>

@@ -234,6 +234,7 @@ export async function submitRegistration(
     phone: formValue(formData, "phone"),
     email: formValue(formData, "email"),
     industry: formValue(formData, "industry"),
+    industry_other: formValue(formData, "industry_other"),
     profession: formValue(formData, "profession"),
     designation: formValue(formData, "designation"),
     place: formValue(formData, "place"),
@@ -253,6 +254,7 @@ export async function submitRegistration(
       phone: fieldErrors.phone,
       email: fieldErrors.email,
       industry: fieldErrors.industry,
+      industry_other: fieldErrors.industry_other,
       profession: fieldErrors.profession,
       designation: fieldErrors.designation,
       place: fieldErrors.place,
@@ -266,6 +268,7 @@ export async function submitRegistration(
       phone: submittedValues.phone,
       email: submittedValues.email,
       industry: submittedValues.industry,
+      industry_other: submittedValues.industry_other,
       profession: submittedValues.profession,
       designation: submittedValues.designation,
       place: submittedValues.place,
@@ -306,6 +309,7 @@ export async function submitRegistration(
     phone: parsed.data.phone,
     email: parsed.data.email,
     industry: parsed.data.industry,
+    industry_other: parsed.data.industry_other,
     profession: parsed.data.profession,
     designation: parsed.data.designation,
     place: parsed.data.place,
@@ -341,7 +345,10 @@ export async function submitRegistration(
     p_last_name: registration.last_name,
     p_phone: registration.phone,
     p_email: registration.email,
-    p_industry: registration.industry,
+    p_industry:
+      registration.industry === "Other"
+        ? registration.industry_other
+        : registration.industry,
     p_profession: registration.profession,
     p_designation: registration.designation,
     p_place: registration.place,
