@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { PiCheck } from "react-icons/pi";
@@ -12,6 +11,7 @@ import {
   CHECKOUT_COOKIE_NAME,
   isCheckoutToken,
 } from "@/lib/summit/constants";
+import { summitSite } from "@/lib/summit/site";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export const dynamic = "force-dynamic";
@@ -146,10 +146,23 @@ export default async function ConfirmationPage() {
               )}
             </div>
 
+            <p className="mx-auto mt-7 max-w-[610px] text-center text-sm leading-6 text-[var(--ink-72)]">
+              Need help with your payment or registration? Email{" "}
+              <a
+                className="font-semibold text-[var(--navy)] underline underline-offset-4 hover:text-[var(--brass)]"
+                href={`mailto:${summitSite.supportEmail}`}
+              >
+                {summitSite.supportEmail}
+              </a>
+            </p>
+
             <div className="summit-actions mx-auto max-w-[610px] justify-center">
-              <Link className="button-secondary inline-flex h-11 items-center justify-center px-5" href="/contact">
+              <a
+                className="button-secondary inline-flex h-11 items-center justify-center px-5"
+                href={`mailto:${summitSite.supportEmail}`}
+              >
                 Contact support
-              </Link>
+              </a>
               <form action={startAnotherRegistration}>
                 <button className="button-primary h-11 w-full px-5" type="submit">
                   Register another attendee

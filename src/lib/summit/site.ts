@@ -7,7 +7,8 @@ export const summitSite = {
   name: "Jalna Investment Summit",
   organizer:
     optionalSetting("EVENT_ORGANIZER_NAME") ?? "Jalna Investment Summit Organiser",
-  supportEmail: optionalSetting("EVENT_SUPPORT_EMAIL"),
+  supportEmail:
+    optionalSetting("EVENT_SUPPORT_EMAIL") ?? "jalnafirstcf@gmail.com",
   supportPhone: optionalSetting("EVENT_SUPPORT_PHONE"),
   eventDate:
     optionalSetting("EVENT_DATE") ??

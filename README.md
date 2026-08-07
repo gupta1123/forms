@@ -28,7 +28,7 @@ Razorpay keys with live keys only when the site is ready to accept real money.
 2. Required personal and professional details are stored through a validated PostgreSQL function.
 3. An opaque checkout token is saved in an HTTP-only cookie.
 4. The visitor reviews the ₹2,999 summit plan on `/plans`.
-5. The `SUMIT26` redeem code changes the server-verified amount to ₹2,399.
+5. The `SUMMIT26` redeem code changes the server-verified amount to ₹2,399.
 6. Razorpay Checkout creates and verifies the payment using server-only credentials.
 7. A captured payment opens `/confirmation` with registration and payment references.
 8. Opening the main URL always shows the form. Submitting the same paid email and phone reconnects the attendee to the plan page and shows that payment is already complete.
@@ -89,8 +89,8 @@ Razorpay webhook records successful payments.
 
 ## Redeem code
 
-`SUMIT26` applies a ₹600 discount. Migration
-`202608060005_change_redeem_code_to_sumit26.sql` safely replaces the earlier
+`SUMMIT26` applies a ₹600 discount. Migration
+`202608070001_correct_redeem_code_to_summit26.sql` safely corrects the earlier
 code while preserving linked registrations and redemption counts. Redeem-code
 validation and pricing happen in PostgreSQL; the browser cannot set the payable
 amount.
