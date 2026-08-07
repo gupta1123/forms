@@ -140,7 +140,7 @@ export async function POST(request: Request) {
         name: `${application.first_name} ${application.last_name}`,
         email: application.email,
         contact: application.phone,
-        description: "Investment Summit Pass",
+        description: "Industrial Summit Pass",
       },
       { headers: { "Cache-Control": "private, no-store" } },
     );
@@ -151,4 +151,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

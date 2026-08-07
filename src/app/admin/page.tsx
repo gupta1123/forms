@@ -43,7 +43,7 @@ export default async function AdminDashboardPage({
       <div className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:py-10">
         <div className="mb-7">
           <p className="text-sm font-semibold text-[var(--brass)]">
-            Investment Summit
+            Industrial Summit
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
             Registrations

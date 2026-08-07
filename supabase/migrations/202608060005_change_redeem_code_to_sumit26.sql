@@ -14,7 +14,7 @@ begin
   for update;
 
   if v_plan_id is null then
-    raise exception 'Investment Summit plan not found';
+    raise exception 'Industrial Summit plan not found';
   end if;
 
   insert into public.summit_redeem_codes (

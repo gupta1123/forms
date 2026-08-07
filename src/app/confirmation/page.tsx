@@ -17,8 +17,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Registration Confirmed | Jalna Investment Summit",
-  description: "Your Jalna Investment Summit registration confirmation.",
+  title: "Registration Confirmed | Industrial Summit",
+  description: "Your Industrial Summit registration confirmation.",
   robots: { index: false, follow: false },
 };
 
@@ -128,7 +128,7 @@ export default async function ConfirmationPage() {
               <dl className="summit-confirmation-grid">
               <ConfirmationItem label="Registration reference" value={registrationReference} />
               <ConfirmationItem label="Payment reference" value={paymentReference} />
-              <ConfirmationItem label="Summit pass" value={plan?.name ?? "Investment Summit Pass"} />
+              <ConfirmationItem label="Summit pass" value={plan?.name ?? "Industrial Summit Pass"} />
               <ConfirmationItem label="Amount paid" value={formatRupees(order?.amount_paise ?? application.amount_due_paise)} />
               <ConfirmationItem label="Registered email" value={application.email} />
               <ConfirmationItem label="Payment method" value={formatPaymentMethod(attempt?.method)} />

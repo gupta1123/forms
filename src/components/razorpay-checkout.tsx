@@ -91,7 +91,7 @@ export function RazorpayCheckout({
         key: order.keyId,
         amount: order.amount,
         currency: order.currency,
-        name: "Investment Summit",
+        name: "Industrial Summit",
         description: order.description,
         order_id: order.orderId,
         prefill: {

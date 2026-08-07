@@ -5,8 +5,8 @@ import { PublicInformationPage } from "@/components/public-information-page";
 import { summitSite } from "@/lib/summit/site";
 
 export const metadata: Metadata = {
-  title: "Pricing | Investment Summit",
-  description: "Investment Summit registration pricing and inclusions.",
+  title: "Pricing | Industrial Summit",
+  description: "Industrial Summit registration pricing and inclusions.",
 };
 
 export default function PricingPage() {
@@ -17,11 +17,11 @@ export default function PricingPage() {
       intro="Review the registration price before submitting your details or opening Razorpay Checkout."
     >
       <section className="rounded-2xl bg-[var(--navy-deep)] p-6 text-white sm:p-8">
-        <p className="!text-sm !text-white/60">Investment Summit Pass</p>
+        <p className="!text-sm !text-white/60">Industrial Summit Pass</p>
         <p className="mt-2 !text-4xl !font-semibold !text-white">₹2,999</p>
         <p className="mt-2 !text-sm !text-white/60">Inclusive of applicable GST</p>
         <ul className="mt-6 marker:text-[var(--steel)] [&_li]:!text-[#dcebed]">
-          <li>One attendee registration for the Investment Summit</li>
+          <li>One attendee registration for the Industrial Summit</li>
           <li>Access according to the confirmed event schedule and venue</li>
           <li>Secure payment through Razorpay Checkout</li>
         </ul>

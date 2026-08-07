@@ -392,7 +392,7 @@ function toAdminRegistration(
     designation: application.designation,
     place: application.place,
     summit_expectations: application.summit_expectations,
-    plan_name: plan?.name ?? "Investment Summit Pass",
+    plan_name: plan?.name ?? "Industrial Summit Pass",
     redeem_code: redeemCode?.code_normalized ?? null,
     original_amount_paise: application.original_amount_paise,
     amount_due_paise: application.amount_due_paise,

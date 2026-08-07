@@ -1,4 +1,4 @@
--- Public registration flow for the Investment Summit.
+-- Public registration flow for the Industrial Summit.
 -- Tables have no direct anon/authenticated access. All public access is through
 -- narrowly scoped security-definer functions that validate a random checkout token.
 
@@ -117,8 +117,8 @@ insert into public.summit_plans (
 )
 values (
   'investment-summit-pass',
-  'Investment Summit Pass',
-  'Registration for the Investment Summit.',
+  'Industrial Summit Pass',
+  'Registration for the Industrial Summit.',
   299900,
   true,
   true
@@ -399,4 +399,3 @@ grant execute on function public.save_summit_application(text, text, text, text,
 grant execute on function public.get_summit_registration(uuid) to anon, authenticated;
 grant execute on function public.get_summit_checkout(uuid) to anon, authenticated;
 grant execute on function public.apply_summit_redeem_code(uuid, text) to anon, authenticated;
-

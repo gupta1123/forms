@@ -26,7 +26,7 @@ export function SummitHeader({
         <div className="summit-header-inner">
           <Link className="summit-brand" href="/">
             <Image
-              alt="Investors Summit 2026 — A Jalna First Initiative"
+              alt="Industrial Summit"
               className="summit-brand-logo"
               height={660}
               priority

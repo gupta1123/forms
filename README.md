@@ -1,4 +1,4 @@
-# Jalna Investment Summit registration
+# Industrial Summit registration
 
 A public registration and plan-selection flow built with Next.js and Supabase.
 

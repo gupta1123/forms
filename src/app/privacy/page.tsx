@@ -4,8 +4,8 @@ import { PublicInformationPage } from "@/components/public-information-page";
 import { summitSite } from "@/lib/summit/site";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Investment Summit",
-  description: "How Investment Summit registration information is collected and used.",
+  title: "Privacy Policy | Industrial Summit",
+  description: "How Industrial Summit registration information is collected and used.",
 };
 
 export default function PrivacyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
     <PublicInformationPage
       eyebrow="Last updated 6 August 2026"
       title="Privacy policy"
-      intro={`${summitSite.organizer} uses attendee information only for operating the Investment Summit and related registration support.`}
+      intro={`${summitSite.organizer} uses attendee information only for operating the Industrial Summit and related registration support.`}
     >
       <section>
         <h2>Information we collect</h2>

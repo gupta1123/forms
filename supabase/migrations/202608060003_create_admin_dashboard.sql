@@ -1,4 +1,4 @@
--- Admin-only access for the Investment Summit dashboard.
+-- Admin-only access for the Industrial Summit dashboard.
 -- Attendee registration stays public, but dashboard access requires both a
 -- valid Supabase Auth session and membership in summit_admins.
 
@@ -155,4 +155,3 @@ revoke all on function public.add_summit_admin_by_email(text, text) from public;
 
 grant execute on function public.is_summit_admin() to authenticated;
 grant execute on function public.get_summit_admin_dashboard(integer) to authenticated;
-

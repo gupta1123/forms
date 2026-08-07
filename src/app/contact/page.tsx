@@ -4,8 +4,8 @@ import { PublicInformationPage } from "@/components/public-information-page";
 import { summitSite } from "@/lib/summit/site";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Investment Summit",
-  description: "Contact the Investment Summit registration team.",
+  title: "Contact Us | Industrial Summit",
+  description: "Contact the Industrial Summit registration team.",
 };
 
 export default function ContactPage() {

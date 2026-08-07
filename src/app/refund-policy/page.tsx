@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { PublicInformationPage } from "@/components/public-information-page";
 
 export const metadata: Metadata = {
-  title: "Cancellation and Refund Policy | Investment Summit",
-  description: "Investment Summit cancellation and refund process.",
+  title: "Cancellation and Refund Policy | Industrial Summit",
+  description: "Industrial Summit cancellation and refund process.",
 };
 
 export default function RefundPolicyPage() {

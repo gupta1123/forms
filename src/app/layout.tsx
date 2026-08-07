@@ -24,8 +24,8 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jalna Investment Summit | Registration",
-  description: "Register for the Jalna Investment Summit and select your summit pass.",
+  title: "Industrial Summit | Registration",
+  description: "Register for the Industrial Summit and select your summit pass.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

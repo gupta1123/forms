@@ -4,9 +4,9 @@ function optionalSetting(name: string) {
 }
 
 export const summitSite = {
-  name: "Jalna Investment Summit",
+  name: "Industrial Summit",
   organizer:
-    optionalSetting("EVENT_ORGANIZER_NAME") ?? "Jalna Investment Summit Organiser",
+    optionalSetting("EVENT_ORGANIZER_NAME") ?? "Industrial Summit Organiser",
   supportEmail:
     optionalSetting("EVENT_SUPPORT_EMAIL") ?? "office@jalnafirst.in",
   supportPhone: optionalSetting("EVENT_SUPPORT_PHONE"),

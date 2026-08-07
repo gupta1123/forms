@@ -9,7 +9,7 @@ export function AdminHeader({ email }: { email: string }) {
       <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-8">
         <Link className="flex min-w-0 items-center gap-3" href="/admin">
           <Image
-            alt="Investors Summit 2026 — A Jalna First Initiative"
+            alt="Industrial Summit"
             className="h-auto w-[170px] mix-blend-multiply sm:w-[220px]"
             height={660}
             priority

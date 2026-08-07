@@ -4,8 +4,8 @@ import { PublicInformationPage } from "@/components/public-information-page";
 import { summitSite } from "@/lib/summit/site";
 
 export const metadata: Metadata = {
-  title: "Shipping and Delivery Policy | Investment Summit",
-  description: "How Investment Summit registration confirmation and access are delivered.",
+  title: "Shipping and Delivery Policy | Industrial Summit",
+  description: "How Industrial Summit registration confirmation and access are delivered.",
 };
 
 export default function DeliveryPolicyPage() {

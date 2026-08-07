@@ -113,7 +113,7 @@ export async function sendPaymentConfirmationEmail(
     const paidAt = attempt?.captured_at ?? application.paid_at;
     const testMode = order.key_mode === "test";
     const supportEmail = summitSite.supportEmail;
-    const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Jalna Investment Summit`;
+    const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Industrial Summit`;
     const logoUrl = `${siteUrl()}/investors-summit-2026-logo.png`;
 
     const response = await fetch("https://api.resend.com/emails", {
@@ -133,7 +133,7 @@ export async function sendPaymentConfirmationEmail(
           attendeeName,
           paidAt,
           paymentReference,
-          planName: plan?.name ?? "Investment Summit Pass",
+          planName: plan?.name ?? "Industrial Summit Pass",
           redeemCode: redeemCode?.code_normalized ?? null,
           registrationReference,
           logoUrl,
@@ -145,7 +145,7 @@ export async function sendPaymentConfirmationEmail(
           attendeeName,
           paidAt,
           paymentReference,
-          planName: plan?.name ?? "Investment Summit Pass",
+          planName: plan?.name ?? "Industrial Summit Pass",
           redeemCode: redeemCode?.code_normalized ?? null,
           registrationReference,
           supportEmail,
@@ -219,7 +219,7 @@ function renderConfirmationHtml(values: TemplateValues) {
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #093c54">
           <tr><td align="center" style="background:#ffffff;padding:22px 30px">
-            <img src="${escapeHtml(values.logoUrl)}" width="520" alt="Investors Summit 2026 — A Jalna First Initiative" style="display:block;width:100%;max-width:520px;height:auto;border:0" />
+            <img src="${escapeHtml(values.logoUrl)}" width="520" alt="Industrial Summit" style="display:block;width:100%;max-width:520px;height:auto;border:0" />
           </td></tr>
           <tr><td style="background:#052c3e;color:#f5fbfb;padding:24px 30px">
             <h1 style="margin:0;font-family:Georgia,serif;font-size:32px;font-weight:normal">Payment confirmed</h1>
@@ -245,7 +245,7 @@ function renderConfirmationText(values: Omit<TemplateValues, "logoUrl">) {
   return [
     `Hello ${values.attendeeName},`,
     "",
-    "Your payment has been received and your Jalna Investment Summit registration is confirmed.",
+    "Your payment has been received and your Industrial Summit registration is confirmed.",
     ...(values.testMode ? ["TEST MODE: No real money was charged."] : []),
     "",
     `Registration reference: ${values.registrationReference}`,

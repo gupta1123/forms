@@ -4,8 +4,8 @@ import { PublicInformationPage } from "@/components/public-information-page";
 import { summitSite } from "@/lib/summit/site";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | Investment Summit",
-  description: "Terms governing Investment Summit registration and attendance.",
+  title: "Terms and Conditions | Industrial Summit",
+  description: "Terms governing Industrial Summit registration and attendance.",
 };
 
 export default function TermsPage() {
@@ -13,7 +13,7 @@ export default function TermsPage() {
     <PublicInformationPage
       eyebrow="Last updated 6 August 2026"
       title="Terms and conditions"
-      intro={`These terms govern registration for and participation in the Investment Summit organised by ${summitSite.organizer}.`}
+      intro={`These terms govern registration for and participation in the Industrial Summit organised by ${summitSite.organizer}.`}
     >
       <section>
         <h2>Registration</h2>
