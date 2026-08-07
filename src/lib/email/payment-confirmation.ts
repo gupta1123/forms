@@ -112,7 +112,6 @@ export async function sendPaymentConfirmationEmail(
     const paidAt = attempt?.captured_at ?? application.paid_at;
     const testMode = order.key_mode === "test";
     const supportEmail = process.env.EVENT_SUPPORT_EMAIL?.trim();
-    const confirmationUrl = `${siteUrl()}/confirmation`;
     const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Jalna Investment Summit`;
 
     const response = await fetch("https://api.resend.com/emails", {
@@ -130,7 +129,6 @@ export async function sendPaymentConfirmationEmail(
         html: renderConfirmationHtml({
           amount,
           attendeeName,
-          confirmationUrl,
           paidAt,
           paymentReference,
           planName: plan?.name ?? "Investment Summit Pass",
@@ -141,7 +139,6 @@ export async function sendPaymentConfirmationEmail(
         text: renderConfirmationText({
           amount,
           attendeeName,
-          confirmationUrl,
           paidAt,
           paymentReference,
           planName: plan?.name ?? "Investment Summit Pass",
@@ -189,7 +186,6 @@ export async function sendPaymentConfirmationEmail(
 type TemplateValues = {
   amount: string;
   attendeeName: string;
-  confirmationUrl: string;
   paidAt: string | null;
   paymentReference: string;
   planName: string;
@@ -226,7 +222,6 @@ function renderConfirmationHtml(values: TemplateValues) {
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">
               ${rows.map(([label, value]) => `<tr><td style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;color:#507080">${escapeHtml(label)}</td><td align="right" style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;font-weight:bold">${escapeHtml(value)}</td></tr>`).join("")}
             </table>
-            <p style="margin:26px 0 0"><a href="${escapeHtml(values.confirmationUrl)}" style="display:inline-block;background:#0c4a66;color:#f5fbfb;padding:13px 20px;text-decoration:none">View registration confirmation</a></p>
             <p style="margin:24px 0 0;color:#507080;font-size:13px;line-height:1.6">Keep this email for your records. Venue updates will be sent to your registered email address.</p>
           </td></tr>
         </table>
@@ -249,15 +244,7 @@ function renderConfirmationText(values: TemplateValues) {
     `Amount paid: ${values.amount}`,
     ...(values.redeemCode ? [`Redeem code: ${values.redeemCode}`] : []),
     ...(values.paidAt ? [`Paid on: ${formatDate(values.paidAt)}`] : []),
-    "",
-    `View confirmation: ${values.confirmationUrl}`,
   ].join("\n");
-}
-
-function siteUrl() {
-  const configured =
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.URL?.trim();
-  return (configured || "https://jalna-investment-summit.netlify.app").replace(/\/$/, "");
 }
 
 function formatRupees(paise: number) {
