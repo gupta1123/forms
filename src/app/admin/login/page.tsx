@@ -25,10 +25,10 @@ export default async function AdminLoginPage() {
           <Image
             alt="Industrial Summit"
             className="h-auto w-[300px] mix-blend-multiply"
-            height={660}
+            height={505}
             priority
-            src="/investors-summit-2026-logo.png"
-            width={2616}
+            src="/industrailsummitlogo.jpeg"
+            width={1566}
           />
         </div>
         <div className="relative max-w-lg">
@@ -44,10 +44,10 @@ export default async function AdminLoginPage() {
           <Image
             alt="Industrial Summit"
             className="mb-7 h-auto w-full max-w-[300px] mix-blend-multiply lg:hidden"
-            height={660}
+            height={505}
             priority
-            src="/investors-summit-2026-logo.png"
-            width={2616}
+            src="/industrailsummitlogo.jpeg"
+            width={1566}
           />
           <span className="inline-flex rounded-full bg-[var(--paper-deep)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--navy)]">Admin access</span>
           <h2 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Sign in to the dashboard</h2>

@@ -11,10 +11,10 @@ export function AdminHeader({ email }: { email: string }) {
           <Image
             alt="Industrial Summit"
             className="h-auto w-[170px] mix-blend-multiply sm:w-[220px]"
-            height={660}
+            height={505}
             priority
-            src="/investors-summit-2026-logo.png"
-            width={2616}
+            src="/industrailsummitlogo.jpeg"
+            width={1566}
           />
           <span className="hidden rounded-full border border-[var(--ink-16)] bg-[var(--paper)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--navy)] md:inline-flex">
             Admin
