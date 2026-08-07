@@ -5,10 +5,22 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { createAdminAuthClient } from "@/lib/supabase/admin-server";
+import type {
+  AdminListFilters,
+  AdminRegistration,
+} from "@/lib/admin/types";
+import { decodeSummitPreferences } from "@/lib/summit/preferences";
 
 const adminLoginSchema = z.object({
   identifier: z.string().trim().min(1, "Enter your username or email."),
   password: z.string().min(1, "Enter your password."),
+});
+
+const exportFiltersSchema = z.object({
+  search: z.string().trim().max(80),
+  payment: z.enum(["all", "awaiting", "paid", "cancelled"]),
+  pricing: z.enum(["all", "redeemed", "standard"]),
+  sort: z.enum(["recent", "oldest"]),
 });
 
 export type AdminLoginState = {
@@ -100,4 +112,73 @@ export async function adminSignOut() {
   await supabase.auth.signOut();
   revalidatePath("/admin", "layout");
   redirect("/admin/login");
+}
+
+export async function getAdminRegistrationExport(
+  input: Pick<AdminListFilters, "search" | "payment" | "pricing" | "sort">,
+) {
+  const filters = exportFiltersSchema.parse(input);
+  const supabase = await createAdminAuthClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+
+  if (!claimsData?.claims?.sub) {
+    throw new Error("Your administrator session has expired.");
+  }
+
+  const { data: isAdmin, error: accessError } = await supabase.rpc(
+    "is_summit_admin",
+  );
+  if (accessError || !isAdmin) {
+    throw new Error("Administrator access is required.");
+  }
+
+  const { data, error } = await supabase.rpc("get_summit_admin_dashboard", {
+    p_limit: 1000,
+  });
+  if (error || !data) {
+    throw new Error("The registration export could not be loaded.");
+  }
+
+  const registrations = (
+    data as { registrations: AdminRegistration[] }
+  ).registrations;
+  const normalisedSearch = filters.search.toLowerCase();
+
+  return registrations
+    .filter((registration) => {
+      const preferences = decodeSummitPreferences(
+        registration.summit_expectations,
+      );
+      const matchesSearch =
+        !normalisedSearch ||
+        [
+          registration.first_name,
+          registration.last_name,
+          registration.email,
+          registration.phone,
+          registration.industry,
+          registration.profession,
+          registration.designation,
+          registration.place,
+          preferences.purpose,
+          registration.redeem_code ?? "",
+        ].some((value) => value.toLowerCase().includes(normalisedSearch));
+      const matchesPayment =
+        filters.payment === "all" ||
+        (filters.payment === "awaiting" &&
+          ["details_submitted", "payment_pending"].includes(
+            registration.payment_status,
+          )) ||
+        registration.payment_status === filters.payment;
+      const matchesPricing =
+        filters.pricing === "all" ||
+        (filters.pricing === "redeemed" && Boolean(registration.redeem_code)) ||
+        (filters.pricing === "standard" && !registration.redeem_code);
+
+      return matchesSearch && matchesPayment && matchesPricing;
+    })
+    .sort((left, right) => {
+      const difference = left.application_id - right.application_id;
+      return filters.sort === "recent" ? -difference : difference;
+    });
 }

@@ -1,6 +1,6 @@
 import type { Column } from "write-excel-file/browser";
 
-import type { AdminRegistration } from "@/components/admin-dashboard";
+import type { AdminRegistration } from "@/lib/admin/types";
 import { decodeSummitPreferences } from "@/lib/summit/preferences";
 
 type ExportRegistration = AdminRegistration & {

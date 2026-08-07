@@ -1,55 +1,93 @@
-import { redirect } from "next/navigation";
-
-import { adminSignOut } from "@/app/admin/actions";
-import {
-  AdminDashboard,
-  type AdminDashboardData,
-} from "@/components/admin-dashboard";
-import { createAdminAuthClient } from "@/lib/supabase/admin-server";
+import { AdminDashboard } from "@/components/admin-dashboard";
+import { AdminHeader } from "@/components/admin-header";
+import { requireSummitAdmin } from "@/lib/admin/access";
+import { getAdminRegistrationPage } from "@/lib/admin/data";
+import type {
+  AdminDashboardData,
+  AdminListFilters,
+  AdminMetrics,
+} from "@/lib/admin/types";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboardPage() {
-  const supabase = await createAdminAuthClient();
-  const { data: claimsData } = await supabase.auth.getClaims();
+type DashboardSummary = {
+  generated_at: string;
+  source: string;
+  metrics: AdminMetrics;
+};
 
-  if (!claimsData?.claims?.sub) redirect("/admin/login");
+export default async function AdminDashboardPage({
+  searchParams,
+}: PageProps<"/admin">) {
+  const filters = parseFilters(await searchParams);
+  const { email, supabase } = await requireSummitAdmin();
+  const [summaryResult, pageData] = await Promise.all([
+    supabase.rpc("get_summit_admin_dashboard", { p_limit: 1 }),
+    getAdminRegistrationPage(filters),
+  ]);
 
-  const { data, error } = await supabase.rpc("get_summit_admin_dashboard", {
-    p_limit: 500,
-  });
+  if (summaryResult.error || !summaryResult.data) {
+    throw new Error("The admin dashboard summary could not be loaded.");
+  }
 
-  if (error || !data) redirect("/admin/login");
-
-  const dashboardData = data as AdminDashboardData;
-  const email =
-    typeof claimsData.claims.email === "string"
-      ? claimsData.claims.email
-      : "Administrator";
+  const summary = summaryResult.data as DashboardSummary;
+  const dashboardData: AdminDashboardData = {
+    ...summary,
+    registrations: pageData.registrations,
+    pagination: pageData.pagination,
+  };
 
   return (
     <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">
-      <header className="border-b border-[var(--ink-16)] bg-white">
-        <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-8">
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-[var(--navy-deep)] text-sm font-semibold text-[var(--steel)]">IS</span>
-            <div><p className="text-sm font-semibold tracking-wide">SUMMIT ADMIN</p><p className="text-xs text-[var(--ink-48)]">Registration operations</p></div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden max-w-56 truncate text-sm text-[var(--ink-72)] sm:block">{email}</span>
-            <form action={adminSignOut}><button className="button-secondary h-10 px-4" type="submit">Sign out</button></form>
-          </div>
-        </div>
-      </header>
-
+      <AdminHeader email={email} />
       <div className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:py-10">
         <div className="mb-7">
-          <p className="text-sm font-semibold text-[var(--brass)]">Investment Summit</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Registrations</h1>
-          <p className="mt-2 text-sm text-[var(--ink-72)]">Attendee details, redeem-code usage, and payment status.</p>
+          <p className="text-sm font-semibold text-[var(--brass)]">
+            Investment Summit
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+            Registrations
+          </h1>
+          <p className="mt-2 text-sm text-[var(--ink-72)]">
+            Browse the attendee list, then open a registration for its complete
+            payment history.
+          </p>
         </div>
-        <AdminDashboard data={dashboardData} />
+        <AdminDashboard data={dashboardData} filters={filters} />
       </div>
     </main>
   );
+}
+
+function parseFilters(
+  params: Record<string, string | string[] | undefined>,
+): AdminListFilters {
+  const paymentValue = firstValue(params.payment);
+  const pricingValue = firstValue(params.pricing);
+  const sortValue = firstValue(params.sort);
+  const directionValue = firstValue(params.direction);
+  const cursorValue = firstValue(params.cursor);
+  const parsedCursor = cursorValue && /^\d+$/.test(cursorValue)
+    ? Number(cursorValue)
+    : null;
+
+  return {
+    search: firstValue(params.q).trim().slice(0, 80),
+    payment: ["awaiting", "paid", "cancelled"].includes(paymentValue)
+      ? (paymentValue as AdminListFilters["payment"])
+      : "all",
+    pricing: ["redeemed", "standard"].includes(pricingValue)
+      ? (pricingValue as AdminListFilters["pricing"])
+      : "all",
+    sort: sortValue === "oldest" ? "oldest" : "recent",
+    cursor:
+      parsedCursor && Number.isSafeInteger(parsedCursor) && parsedCursor > 0
+        ? parsedCursor
+        : null,
+    direction: directionValue === "previous" ? "previous" : "next",
+  };
+}
+
+function firstValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
 }

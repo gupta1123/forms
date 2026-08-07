@@ -146,6 +146,17 @@ textarea {
     background: rgb(168 66 44 / 5%);
     border-color: var(--error);
   }
+
+  .admin-page-button {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold transition;
+    border-color: var(--ink-16);
+    color: var(--navy);
+  }
+
+  a.admin-page-button:hover {
+    background: var(--paper-deep);
+    border-color: var(--navy);
+  }
 }
 
 .field-select {
