@@ -13,10 +13,10 @@ const header = (value: string) => ({
   value,
   fontWeight: "bold" as const,
   textColor: "#FFFFFF",
-  backgroundColor: "#1C3F5E",
+  backgroundColor: "#0C4A66",
   alignVertical: "center" as const,
   height: 28,
-  bottomBorderColor: "#BE8A2C",
+  bottomBorderColor: "#0DA1A7",
   bottomBorderStyle: "medium" as const,
 });
 
@@ -26,8 +26,8 @@ const textCell = (value: string | null | undefined, rowIndex: number) => ({
   format: "@",
   alignVertical: "top" as const,
   wrap: true,
-  backgroundColor: rowIndex % 2 === 1 ? "#F7F1E5" : undefined,
-  bottomBorderColor: "#E3DAC8",
+  backgroundColor: rowIndex % 2 === 1 ? "#F5FBFB" : undefined,
+  bottomBorderColor: "#E2F0F2",
   bottomBorderStyle: "thin" as const,
 });
 
@@ -37,8 +37,8 @@ const numberCell = (value: number, rowIndex: number) => ({
   format: '"₹"#,##0',
   align: "right" as const,
   alignVertical: "top" as const,
-  backgroundColor: rowIndex % 2 === 1 ? "#F7F1E5" : undefined,
-  bottomBorderColor: "#E3DAC8",
+  backgroundColor: rowIndex % 2 === 1 ? "#F5FBFB" : undefined,
+  bottomBorderColor: "#E2F0F2",
   bottomBorderStyle: "thin" as const,
 });
 
@@ -49,8 +49,8 @@ const dateCell = (value: string | null, rowIndex: number) =>
         type: Date,
         format: "dd mmm yyyy, hh:mm AM/PM",
         alignVertical: "top" as const,
-        backgroundColor: rowIndex % 2 === 1 ? "#F7F1E5" : undefined,
-        bottomBorderColor: "#E3DAC8",
+        backgroundColor: rowIndex % 2 === 1 ? "#F5FBFB" : undefined,
+        bottomBorderColor: "#E2F0F2",
         bottomBorderStyle: "thin" as const,
       }
     : textCell("", rowIndex);

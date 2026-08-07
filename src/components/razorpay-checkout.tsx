@@ -95,7 +95,7 @@ export function RazorpayCheckout({
           email: order.email,
           contact: order.contact,
         },
-        theme: { color: "#1C3F5E" },
+        theme: { color: "#0C4A66" },
         retry: { enabled: true },
         handler: async (response) => {
           checkoutCompleted = true;
@@ -165,9 +165,9 @@ export function RazorpayCheckout({
 
   if (status === "paid") {
     return (
-      <div className="mt-7 border border-[#8aac75] bg-[#e8efdb] p-4 text-[#29481f]" role="status">
+      <div className="mt-7 border border-[#7fc0c8] bg-[#e7f4f5] p-4 text-[#0c4a66]" role="status">
         <p className="font-semibold">Payment already completed</p>
-        <p className="mt-1 text-xs leading-5 text-[#47643d]">Your summit registration is confirmed. You do not need to pay again.</p>
+        <p className="mt-1 text-xs leading-5 text-[#2c6f79]">Your summit registration is confirmed. You do not need to pay again.</p>
         <a className="mt-3 inline-flex text-xs font-semibold underline underline-offset-2" href="/confirmation">
           View confirmation
         </a>
@@ -196,7 +196,7 @@ export function RazorpayCheckout({
         <div
           className={`mt-4 border px-3 py-2.5 text-xs leading-5 ${
             status === "pending"
-              ? "border-[#be8a2c] bg-[#fff3d6] text-[#6d501e]"
+              ? "border-[#0da1a7] bg-[#e7f4f5] text-[#0c4a66]"
               : status === "error"
                 ? "border-[#a8422c] bg-[#542c2c] text-[#ffd9df]"
                 : "border-white/20 bg-white/10 text-white/70"

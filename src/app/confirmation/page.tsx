@@ -140,7 +140,7 @@ export default async function ConfirmationPage() {
               </dl>
 
               {order?.key_mode === "test" && (
-                <div className="mt-7 border border-[#be8a2c] bg-[#fff3d6] px-4 py-3 text-sm text-[#765521]">
+                <div className="mt-7 border border-[#0da1a7] bg-[#e7f4f5] px-4 py-3 text-sm text-[#0c4a66]">
                   This was a Razorpay Test Mode payment. No real money was charged.
                 </div>
               )}

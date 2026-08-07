@@ -24,7 +24,7 @@ export default function ContactPage() {
             {summitSite.supportEmail && (
               <p>
                 Email: {" "}
-                <a className="font-semibold text-[#6c3d72] hover:underline" href={`mailto:${summitSite.supportEmail}`}>
+                <a className="font-semibold text-[var(--navy)] hover:text-[var(--brass)] hover:underline" href={`mailto:${summitSite.supportEmail}`}>
                   {summitSite.supportEmail}
                 </a>
               </p>
@@ -32,7 +32,7 @@ export default function ContactPage() {
             {summitSite.supportPhone && (
               <p>
                 Phone: {" "}
-                <a className="font-semibold text-[#6c3d72] hover:underline" href={`tel:${summitSite.supportPhone.replace(/\s/g, "")}`}>
+                <a className="font-semibold text-[var(--navy)] hover:text-[var(--brass)] hover:underline" href={`tel:${summitSite.supportPhone.replace(/\s/g, "")}`}>
                   {summitSite.supportPhone}
                 </a>
               </p>

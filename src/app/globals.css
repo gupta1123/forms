@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #f1eadb;
-  --paper-deep: #e5dac2;
-  --card: #fbf6ec;
-  --ink: #14202b;
-  --navy: #1c3f5e;
-  --navy-deep: #0e2436;
-  --brass: #be8a2c;
-  --seed: #5e8c3e;
+  --paper: #f5fbfb;
+  --paper-deep: #e2f0f2;
+  --card: #ffffff;
+  --ink: #093c54;
+  --navy: #0c4a66;
+  --navy-deep: #052c3e;
+  --brass: #0da1a7;
+  --seed: #2c8f99;
+  --steel: #7fc0c8;
   --error: #a8422c;
-  --ink-72: rgb(20 32 43 / 72%);
-  --ink-48: rgb(20 32 43 / 48%);
-  --ink-16: rgb(20 32 43 / 16%);
+  --ink-72: rgb(9 60 84 / 72%);
+  --ink-48: rgb(9 60 84 / 48%);
+  --ink-16: rgb(9 60 84 / 16%);
   --background: var(--paper);
   --foreground: var(--ink);
 }
@@ -128,7 +129,7 @@ textarea {
 
   .field-input:hover,
   .field-textarea:hover {
-    border-color: rgb(20 32 43 / 34%);
+    border-color: rgb(9 60 84 / 34%);
   }
 
   .field-input:focus,
@@ -136,7 +137,7 @@ textarea {
   .field-select:focus {
     background: #fff;
     border-color: var(--navy);
-    box-shadow: 0 0 0 3px rgb(28 63 94 / 13%);
+    box-shadow: 0 0 0 3px rgb(12 74 102 / 13%);
   }
 
   .field-input[aria-invalid="true"],
@@ -173,7 +174,7 @@ textarea {
 }
 
 .summit-progress {
-  background: rgb(20 32 43 / 10%);
+  background: rgb(9 60 84 / 10%);
   height: 3px;
   inset: 0 0 auto;
   position: fixed;
@@ -188,7 +189,7 @@ textarea {
 }
 
 .summit-header {
-  background: rgb(241 234 219 / 96%);
+  background: rgb(245 251 251 / 96%);
   border-bottom: 1px solid var(--ink-16);
   position: sticky;
   top: 0;
@@ -362,7 +363,7 @@ textarea {
 }
 
 .summit-step-number {
-  background: rgb(20 32 43 / 7%);
+  background: rgb(9 60 84 / 7%);
   border: 1.5px solid transparent;
   border-radius: 2px;
   color: var(--ink-48);
@@ -588,7 +589,7 @@ textarea {
 }
 
 .summit-option-card:hover {
-  border-color: rgb(20 32 43 / 34%);
+  border-color: rgb(9 60 84 / 34%);
 }
 
 .summit-option-card:has(input:checked) {
@@ -767,7 +768,7 @@ textarea {
 }
 
 .summit-price-row {
-  color: rgb(241 234 219 / 82%);
+  color: rgb(245 251 251 / 82%);
   display: flex;
   font-size: 14.8px;
   gap: 14px;
@@ -782,17 +783,17 @@ textarea {
 
 .summit-price-row.is-discount,
 .summit-price-row.is-discount strong {
-  color: #a8ce86;
+  color: var(--steel);
 }
 
 .summit-total {
-  border-top: 1px solid rgb(241 234 219 / 20%);
+  border-top: 1px solid rgb(245 251 251 / 20%);
   margin-top: auto;
   padding-top: 22px;
 }
 
 .summit-total-label {
-  color: rgb(241 234 219 / 60%);
+  color: rgb(245 251 251 / 60%);
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 10.5px;
   letter-spacing: 0.16em;
@@ -814,7 +815,7 @@ textarea {
 }
 
 .summit-total-note {
-  color: rgb(241 234 219 / 55%);
+  color: rgb(245 251 251 / 55%);
   font-size: 12.5px;
 }
 
@@ -837,7 +838,7 @@ textarea {
 }
 
 .summit-payment-button:hover {
-  box-shadow: 7px 7px 0 #06131d;
+  box-shadow: 7px 7px 0 var(--navy-deep);
   transform: translate(-2px, -2px);
 }
 
@@ -859,7 +860,7 @@ textarea {
 
 .summit-success-icon {
   align-items: center;
-  background: rgb(94 140 62 / 16%);
+  background: rgb(44 143 153 / 16%);
   border: 1.8px solid var(--ink);
   border-radius: 999px;
   color: var(--seed);
@@ -929,9 +930,9 @@ textarea {
 }
 
 .summit-notice.is-success {
-  background: rgb(94 140 62 / 10%);
-  border-color: rgb(94 140 62 / 45%);
-  color: #385f27;
+  background: rgb(44 143 153 / 10%);
+  border-color: rgb(44 143 153 / 45%);
+  color: var(--navy);
 }
 
 .summit-footer {

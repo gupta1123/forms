@@ -210,24 +210,24 @@ function renderConfirmationHtml(values: TemplateValues) {
 
   return `<!doctype html>
 <html lang="en">
-  <body style="margin:0;background:#f1eadb;color:#14202b;font-family:Arial,sans-serif">
+  <body style="margin:0;background:#f5fbfb;color:#093c54;font-family:Arial,sans-serif">
     <div style="display:none;max-height:0;overflow:hidden">Your summit payment has been confirmed.</div>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1eadb;padding:32px 16px">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5fbfb;padding:32px 16px">
       <tr><td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fbf6ec;border:1px solid #14202b">
-          <tr><td style="background:#0e2436;color:#f1eadb;padding:24px 30px">
-            <p style="margin:0;color:#be8a2c;font-size:12px;letter-spacing:2px;text-transform:uppercase">Jalna Investment Summit</p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #093c54">
+          <tr><td style="background:#052c3e;color:#f5fbfb;padding:24px 30px">
+            <p style="margin:0;color:#7fc0c8;font-size:12px;letter-spacing:2px;text-transform:uppercase">Jalna Investment Summit</p>
             <h1 style="margin:10px 0 0;font-family:Georgia,serif;font-size:32px;font-weight:normal">Payment confirmed</h1>
           </td></tr>
           <tr><td style="padding:30px">
             <p style="margin:0 0 16px;font-size:17px">Hello ${escapeHtml(values.attendeeName)},</p>
             <p style="margin:0 0 22px;line-height:1.6">Your payment has been received and your registration is confirmed.</p>
-            ${values.testMode ? '<p style="margin:0 0 22px;padding:12px;background:#fff3d6;border:1px solid #be8a2c;color:#765521"><strong>Test Mode:</strong> no real money was charged.</p>' : ""}
+            ${values.testMode ? '<p style="margin:0 0 22px;padding:12px;background:#e7f4f5;border:1px solid #0da1a7;color:#0c4a66"><strong>Test Mode:</strong> no real money was charged.</p>' : ""}
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">
-              ${rows.map(([label, value]) => `<tr><td style="border-top:1px solid rgba(20,32,43,.16);padding:11px 0;color:#66707a">${escapeHtml(label)}</td><td align="right" style="border-top:1px solid rgba(20,32,43,.16);padding:11px 0;font-weight:bold">${escapeHtml(value)}</td></tr>`).join("")}
+              ${rows.map(([label, value]) => `<tr><td style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;color:#507080">${escapeHtml(label)}</td><td align="right" style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;font-weight:bold">${escapeHtml(value)}</td></tr>`).join("")}
             </table>
-            <p style="margin:26px 0 0"><a href="${escapeHtml(values.confirmationUrl)}" style="display:inline-block;background:#1c3f5e;color:#f1eadb;padding:13px 20px;text-decoration:none">View registration confirmation</a></p>
-            <p style="margin:24px 0 0;color:#66707a;font-size:13px;line-height:1.6">Keep this email for your records. Venue updates will be sent to your registered email address.</p>
+            <p style="margin:26px 0 0"><a href="${escapeHtml(values.confirmationUrl)}" style="display:inline-block;background:#0c4a66;color:#f5fbfb;padding:13px 20px;text-decoration:none">View registration confirmation</a></p>
+            <p style="margin:24px 0 0;color:#507080;font-size:13px;line-height:1.6">Keep this email for your records. Venue updates will be sent to your registered email address.</p>
           </td></tr>
         </table>
       </td></tr>
@@ -288,4 +288,3 @@ function escapeHtml(value: string) {
     return entities[character];
   });
 }
-
