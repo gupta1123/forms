@@ -229,6 +229,7 @@ textarea {
   display: block;
   flex: none;
   height: auto;
+  mix-blend-mode: multiply;
   width: 246px;
 }
 

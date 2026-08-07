@@ -21,10 +21,10 @@ export default async function AdminLoginPage() {
       <section className="relative hidden overflow-hidden bg-[var(--navy-deep)] p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="absolute -left-24 top-28 size-96 rounded-full border border-white/10" />
         <div className="absolute left-16 top-52 size-96 rounded-full border border-white/10" />
-        <div className="relative w-fit rounded-2xl bg-white p-4 shadow-sm">
+        <div className="relative w-fit rounded-2xl bg-[var(--paper)] p-4 shadow-sm">
           <Image
             alt="Investors Summit 2026 — A Jalna First Initiative"
-            className="h-auto w-[300px]"
+            className="h-auto w-[300px] mix-blend-multiply"
             height={660}
             priority
             src="/investors-summit-2026-logo.png"
@@ -43,7 +43,7 @@ export default async function AdminLoginPage() {
         <div className="w-full max-w-md rounded-[1.75rem] border border-[var(--ink-16)] bg-white p-7 shadow-[0_30px_80px_-55px_rgba(5,44,62,0.42)] sm:p-9">
           <Image
             alt="Investors Summit 2026 — A Jalna First Initiative"
-            className="mb-7 h-auto w-full max-w-[300px] lg:hidden"
+            className="mb-7 h-auto w-full max-w-[300px] mix-blend-multiply lg:hidden"
             height={660}
             priority
             src="/investors-summit-2026-logo.png"
