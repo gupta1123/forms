@@ -28,6 +28,24 @@ export type RegistrationState = {
   values?: Partial<RegistrationValues>;
 };
 
+export type PaidLookupState = {
+  message?: string;
+  errors?: {
+    email?: string[];
+    phone?: string[];
+  };
+  values?: {
+    email?: string;
+    phone?: string;
+  };
+};
+
+type PaidCandidate = {
+  checkout_token: string | null;
+  email: string;
+  phone: string;
+};
+
 function formValue(formData: FormData, name: string) {
   const input = formData.get(name);
   return typeof input === "string" ? input : "";
@@ -67,6 +85,136 @@ function setPaidMatchCookie(
     path: "/",
     maxAge: PAID_MATCH_COOKIE_MAX_AGE,
   });
+}
+
+async function loadPaidCandidates(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+) {
+  const { data, error } = await supabase
+    .from("summit_applications")
+    .select("checkout_token, email, phone")
+    .eq("status", "paid")
+    .order("paid_at", { ascending: false })
+    .limit(1000);
+
+  return {
+    candidates: (data ?? []) as PaidCandidate[],
+    error,
+  };
+}
+
+function findPaidMatches(
+  candidates: PaidCandidate[],
+  submittedEmail: string,
+  submittedPhone: string,
+) {
+  const emailMatch = submittedEmail
+    ? candidates.find(
+        (candidate) =>
+          candidate.email.trim().toLowerCase() === submittedEmail,
+      )
+    : undefined;
+  const phoneMatch = submittedPhone
+    ? candidates.find(
+        (candidate) => normalizedPhone(candidate.phone) === submittedPhone,
+      )
+    : undefined;
+  const exactMatch =
+    submittedEmail && submittedPhone
+      ? candidates.find(
+          (candidate) =>
+            candidate.email.trim().toLowerCase() === submittedEmail &&
+            normalizedPhone(candidate.phone) === submittedPhone,
+        )
+      : undefined;
+
+  return { emailMatch, exactMatch, phoneMatch };
+}
+
+function redirectForPaidMatch(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+  matches: ReturnType<typeof findPaidMatches>,
+) {
+  if (
+    matches.exactMatch &&
+    isCheckoutToken(matches.exactMatch.checkout_token)
+  ) {
+    cookieStore.delete(PAID_MATCH_COOKIE_NAME);
+    setCheckoutCookie(cookieStore, matches.exactMatch.checkout_token);
+    redirect("/plans");
+  }
+
+  const partialMatch = matches.emailMatch ?? matches.phoneMatch;
+  if (!partialMatch) return;
+
+  cookieStore.delete(CHECKOUT_COOKIE_NAME);
+  setPaidMatchCookie(cookieStore, {
+    kind: matches.emailMatch ? "email" : "phone",
+    maskedEmail: maskEmail(partialMatch.email),
+    maskedPhone: maskPhone(partialMatch.phone),
+  });
+  redirect("/plans");
+}
+
+export async function lookupPaidRegistration(
+  _previousState: PaidLookupState,
+  formData: FormData,
+): Promise<PaidLookupState> {
+  const email = formValue(formData, "lookup_email").trim().toLowerCase();
+  const phone = formValue(formData, "lookup_phone").trim();
+  const errors: PaidLookupState["errors"] = {};
+
+  if (!email && !phone) {
+    return {
+      message: "Enter your registered email address or phone number.",
+      errors: {
+        email: ["Enter an email address or phone number."],
+        phone: ["Enter an email address or phone number."],
+      },
+      values: { email, phone },
+    };
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = ["Enter a valid email address."];
+  }
+
+  const submittedPhone = phone ? normalizedPhone(phone) : "";
+  if (phone && (submittedPhone.length < 7 || submittedPhone.length > 15)) {
+    errors.phone = ["Enter a valid phone number."];
+  }
+
+  if (errors.email || errors.phone) {
+    return {
+      message: "Please check the highlighted field.",
+      errors,
+      values: { email, phone },
+    };
+  }
+
+  const cookieStore = await cookies();
+  const supabase = createSupabaseServiceClient();
+  const { candidates, error } = await loadPaidCandidates(supabase);
+
+  if (error) {
+    console.error("Unable to look up summit registration:", error.message);
+    return {
+      message: "We could not check your registration. Please try again.",
+      values: { email, phone },
+    };
+  }
+
+  const matches = findPaidMatches(candidates, email, submittedPhone);
+  redirectForPaidMatch(cookieStore, matches);
+
+  cookieStore.delete(CHECKOUT_COOKIE_NAME);
+  cookieStore.delete(PAID_MATCH_COOKIE_NAME);
+
+  return {
+    message:
+      "No paid registration was found with those details. You can register as a new attendee.",
+    values: { email, phone },
+  };
 }
 
 export async function submitRegistration(
@@ -159,12 +307,8 @@ export async function submitRegistration(
     summit_expectations: parsed.data.summit_expectations,
   };
 
-  const { data: paidCandidates, error: paidLookupError } = await supabase
-    .from("summit_applications")
-    .select("checkout_token, email, phone")
-    .eq("status", "paid")
-    .order("paid_at", { ascending: false })
-    .limit(1000);
+  const { candidates: paidCandidates, error: paidLookupError } =
+    await loadPaidCandidates(supabase);
 
   if (paidLookupError) {
     console.error("Unable to check existing summit payment:", paidLookupError.message);
@@ -176,35 +320,12 @@ export async function submitRegistration(
 
   const submittedEmail = registration.email.trim().toLowerCase();
   const submittedPhone = normalizedPhone(registration.phone);
-  const exactMatch = paidCandidates?.find(
-    (candidate) =>
-      candidate.email.trim().toLowerCase() === submittedEmail &&
-      normalizedPhone(candidate.phone) === submittedPhone,
+  const matches = findPaidMatches(
+    paidCandidates,
+    submittedEmail,
+    submittedPhone,
   );
-
-  if (exactMatch && isCheckoutToken(exactMatch.checkout_token)) {
-    cookieStore.delete(PAID_MATCH_COOKIE_NAME);
-    setCheckoutCookie(cookieStore, exactMatch.checkout_token);
-    redirect("/plans");
-  }
-
-  const emailMatch = paidCandidates?.find(
-    (candidate) => candidate.email.trim().toLowerCase() === submittedEmail,
-  );
-  const phoneMatch = paidCandidates?.find(
-    (candidate) => normalizedPhone(candidate.phone) === submittedPhone,
-  );
-  const partialMatch = emailMatch ?? phoneMatch;
-
-  if (partialMatch) {
-    cookieStore.delete(CHECKOUT_COOKIE_NAME);
-    setPaidMatchCookie(cookieStore, {
-      kind: emailMatch ? "email" : "phone",
-      maskedEmail: maskEmail(partialMatch.email),
-      maskedPhone: maskPhone(partialMatch.phone),
-    });
-    redirect("/plans");
-  }
+  redirectForPaidMatch(cookieStore, matches);
 
   cookieStore.delete(PAID_MATCH_COOKIE_NAME);
 

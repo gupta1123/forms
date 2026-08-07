@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { PiCheck, PiSealCheck } from "react-icons/pi";
 
+import { startAnotherRegistration } from "@/app/confirmation/actions";
 import { RedeemCodeForm } from "@/components/redeem-code-form";
 import { RazorpayCheckout } from "@/components/razorpay-checkout";
 import { SiteFooter } from "@/components/site-footer";
@@ -121,6 +122,14 @@ export default async function PlansPage({
                 >
                   View payment confirmation
                 </Link>
+                <form action={startAnotherRegistration}>
+                  <button
+                    className="button-secondary h-11 w-full px-5"
+                    type="submit"
+                  >
+                    Register a new attendee
+                  </button>
+                </form>
               </div>
             </div>
           </section>
@@ -315,6 +324,14 @@ function PartialPaidRegistration({ match }: { match: PaidMatch }) {
               The payment receipt has already been sent to the registered email
               address.
             </p>
+
+            <div className="summit-actions mx-auto max-w-[610px] justify-center">
+              <form action={startAnotherRegistration}>
+                <button className="button-primary h-11 w-full px-5" type="submit">
+                  Register a new attendee
+                </button>
+              </form>
+            </div>
           </div>
         </section>
       </SummitShell>

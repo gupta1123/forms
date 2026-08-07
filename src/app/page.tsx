@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { RegistrationForm } from "@/components/registration-form";
+import { RegistrationEntry } from "@/components/registration-entry";
 import { SiteFooter } from "@/components/site-footer";
 import {
   SummitHeader,
@@ -18,7 +18,12 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function RegistrationPage() {
+export default async function RegistrationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
   const cookieStore = await cookies();
   const checkoutToken = cookieStore.get(CHECKOUT_COOKIE_NAME)?.value;
   let initialValues: Partial<RegistrationValues> | null = null;
@@ -61,7 +66,10 @@ export default async function RegistrationPage() {
             title="Who's"
           />
           <div className="summit-panel-body">
-            <RegistrationForm initialValues={initialValues} />
+            <RegistrationEntry
+              initialValues={initialValues}
+              lookupMode={mode === "lookup"}
+            />
           </div>
         </section>
       </SummitShell>
