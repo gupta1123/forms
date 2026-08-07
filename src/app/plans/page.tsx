@@ -310,11 +310,7 @@ function PartialPaidRegistration({ match }: { match: PaidMatch }) {
             <div className="summit-confirmation-card">
               <dl className="summit-confirmation-grid">
                 <PaidRegistrationItem
-                  label={
-                    matchedByEmail
-                      ? "Registered email"
-                      : "Registered email (hidden)"
-                  }
+                  label="Registered email"
                   value={match.maskedEmail}
                 />
                 <PaidRegistrationItem
