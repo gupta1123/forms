@@ -12,6 +12,7 @@ import {
 } from "@/lib/summit/constants";
 import {
   createPaidMatchCookieValue,
+  maskEmail,
   maskPhone,
 } from "@/lib/summit/paid-match";
 import {
@@ -158,7 +159,9 @@ function redirectForPaidMatch(
   const matchedByEmail = Boolean(matches.emailMatch);
   setPaidMatchCookie(cookieStore, {
     kind: matchedByEmail ? "email" : "phone",
-    maskedEmail: partialMatch.email,
+    maskedEmail: matchedByEmail
+      ? partialMatch.email
+      : maskEmail(partialMatch.email),
     maskedPhone: matchedByEmail
       ? maskPhone(partialMatch.phone)
       : partialMatch.phone,
