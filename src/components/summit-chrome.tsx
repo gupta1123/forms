@@ -93,12 +93,13 @@ export function SummitSidebar({
         <p>
           <strong>Thursday, 3 September 2026</strong>
           <br />
-          Jalna, Maharashtra · 9:00 am–3:00 pm, followed by a networking lunch and
-          a dry port site visit.
+          <strong>The Fern Hotel, Jalna</strong>
+          <br />
+          9:00 am–3:00 pm, followed by a networking lunch and a dry port site
+          visit.
         </p>
         <p>
-          <strong>Venue announcing soon.</strong> Registered delegates are
-          notified first by email, before any public announcement.
+          Registered delegates will receive final check-in instructions by email.
         </p>
       </div>
 

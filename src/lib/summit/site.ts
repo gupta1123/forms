@@ -16,5 +16,5 @@ export const summitSite = {
     "The confirmed schedule will be shared with registered attendees.",
   eventLocation:
     optionalSetting("EVENT_LOCATION") ??
-    "The confirmed venue or access details will be shared with registered attendees.",
+    "The Fern Hotel, Jalna",
 } as const;

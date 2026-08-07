@@ -129,6 +129,7 @@ export default async function ConfirmationPage() {
               <ConfirmationItem label="Registration reference" value={registrationReference} />
               <ConfirmationItem label="Payment reference" value={paymentReference} />
               <ConfirmationItem label="Summit pass" value={plan?.name ?? "Industrial Summit Pass"} />
+              <ConfirmationItem label="Venue" value={summitSite.eventLocation} />
               <ConfirmationItem label="Amount paid" value={formatRupees(order?.amount_paise ?? application.amount_due_paise)} />
               <ConfirmationItem label="Registered email" value={application.email} />
               <ConfirmationItem label="Payment method" value={formatPaymentMethod(attempt?.method)} />

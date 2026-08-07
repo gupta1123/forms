@@ -114,6 +114,7 @@ export async function sendPaymentConfirmationEmail(
     const testMode = order.key_mode === "test";
     const supportEmail = summitSite.supportEmail;
     const supportPhone = summitSite.supportPhone;
+    const eventLocation = summitSite.eventLocation;
     const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Industrial Summit`;
     const logoUrl = `${siteUrl()}/investors-summit-2026-logo.png`;
 
@@ -132,6 +133,7 @@ export async function sendPaymentConfirmationEmail(
         html: renderConfirmationHtml({
           amount,
           attendeeName,
+          eventLocation,
           paidAt,
           paymentReference,
           planName: plan?.name ?? "Industrial Summit Pass",
@@ -145,6 +147,7 @@ export async function sendPaymentConfirmationEmail(
         text: renderConfirmationText({
           amount,
           attendeeName,
+          eventLocation,
           paidAt,
           paymentReference,
           planName: plan?.name ?? "Industrial Summit Pass",
@@ -194,6 +197,7 @@ export async function sendPaymentConfirmationEmail(
 type TemplateValues = {
   amount: string;
   attendeeName: string;
+  eventLocation: string;
   paidAt: string | null;
   paymentReference: string;
   planName: string;
@@ -236,7 +240,7 @@ function renderConfirmationHtml(values: TemplateValues) {
               ${rows.map(([label, value]) => `<tr><td style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;color:#507080">${escapeHtml(label)}</td><td align="right" style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;font-weight:bold">${escapeHtml(value)}</td></tr>`).join("")}
             </table>
             <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Need help with your payment or registration? Email <a href="mailto:${escapeHtml(values.supportEmail)}" style="color:#0c4a66;font-weight:bold">${escapeHtml(values.supportEmail)}</a> or call <a href="tel:${escapeHtml(phoneHref(values.supportPhone))}" style="color:#0c4a66;font-weight:bold">${escapeHtml(values.supportPhone)}</a>.</p>
-            <p style="margin:24px 0 0;color:#507080;font-size:13px;line-height:1.6">Keep this email for your records. Venue updates will be sent to your registered email address.</p>
+            <p style="margin:24px 0 0;color:#507080;font-size:13px;line-height:1.6">Venue: <strong>${escapeHtml(values.eventLocation)}</strong>. Keep this email for your records. Any event updates will be sent to your registered email address.</p>
           </td></tr>
         </table>
       </td></tr>
@@ -258,6 +262,7 @@ function renderConfirmationText(values: Omit<TemplateValues, "logoUrl">) {
     `Amount paid: ${values.amount}`,
     ...(values.redeemCode ? [`Redeem code: ${values.redeemCode}`] : []),
     ...(values.paidAt ? [`Paid on: ${formatDate(values.paidAt)}`] : []),
+    `Venue: ${values.eventLocation}`,
     "",
     `Need help with your payment or registration? Email ${values.supportEmail} or call ${values.supportPhone}.`,
   ].join("\n");
