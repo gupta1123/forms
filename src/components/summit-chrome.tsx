@@ -93,7 +93,7 @@ export function SummitSidebar({
         <p>
           <strong>Thursday, 3 September 2026</strong>
           <br />
-          Jalna, Maharashtra · 09:00–14:07, followed by a networking lunch and
+          Jalna, Maharashtra · 9:00 am–3:00 pm, followed by a networking lunch and
           a dry port site visit.
         </p>
         <p>
