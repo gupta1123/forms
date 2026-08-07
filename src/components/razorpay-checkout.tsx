@@ -54,6 +54,10 @@ declare global {
   }
 }
 
+const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+const RAZORPAY_LOAD_TIMEOUT_MS = 15_000;
+let razorpayLoadPromise: Promise<void> | null = null;
+
 export function RazorpayCheckout({
   alreadyPaid,
   amountLabel,
@@ -212,27 +216,59 @@ export function RazorpayCheckout({
 
 function loadRazorpayCheckout() {
   if (window.Razorpay) return Promise.resolve();
+  if (razorpayLoadPromise) return razorpayLoadPromise;
 
-  return new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
-    );
+  // A script element remains in the document after some browser/network
+  // failures. Reusing that failed element means its error event has already
+  // fired, so a second click can wait forever. Remove it and create a fresh
+  // request for every retry.
+  document
+    .querySelector<HTMLScriptElement>(`script[src="${RAZORPAY_CHECKOUT_SRC}"]`)
+    ?.remove();
 
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), { once: true });
-      existingScript.addEventListener(
-        "error",
-        () => reject(new Error("Secure checkout could not be loaded.")),
-        { once: true },
-      );
-      return;
-    }
-
+  razorpayLoadPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    let settled = false;
+
+    const finish = (error?: Error) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      script.onload = null;
+      script.onerror = null;
+
+      if (error) {
+        script.remove();
+        razorpayLoadPromise = null;
+        reject(error);
+        return;
+      }
+
+      resolve();
+    };
+
+    const loadError = () =>
+      finish(
+        new Error(
+          "Razorpay could not be reached. Check your internet connection or disable an ad blocker for this page, then try again. You have not been charged.",
+        ),
+      );
+
+    const timeoutId = window.setTimeout(loadError, RAZORPAY_LOAD_TIMEOUT_MS);
+
+    script.src = RAZORPAY_CHECKOUT_SRC;
     script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Secure checkout could not be loaded."));
+    script.onload = () => {
+      if (!window.Razorpay) {
+        loadError();
+        return;
+      }
+
+      finish();
+    };
+    script.onerror = loadError;
     document.body.appendChild(script);
   });
+
+  return razorpayLoadPromise;
 }
