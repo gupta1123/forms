@@ -9,7 +9,8 @@ export const summitSite = {
     optionalSetting("EVENT_ORGANIZER_NAME") ?? "Industrial Summit Organiser",
   supportEmail:
     optionalSetting("EVENT_SUPPORT_EMAIL") ?? "office@jalnafirst.in",
-  supportPhone: optionalSetting("EVENT_SUPPORT_PHONE"),
+  supportPhone:
+    optionalSetting("EVENT_SUPPORT_PHONE") ?? "+91 89838 24434",
   eventDate:
     optionalSetting("EVENT_DATE") ??
     "The confirmed schedule will be shared with registered attendees.",

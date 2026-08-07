@@ -146,7 +146,15 @@ export default async function ConfirmationPage() {
                 href={`mailto:${summitSite.supportEmail}`}
               >
                 {summitSite.supportEmail}
+              </a>{" "}
+              or call{" "}
+              <a
+                className="font-semibold text-[var(--navy)] underline underline-offset-4 hover:text-[var(--brass)]"
+                href={`tel:${summitSite.supportPhone.replace(/\s+/g, "")}`}
+              >
+                {summitSite.supportPhone}
               </a>
+              .
             </p>
 
             <div className="summit-actions mx-auto max-w-[610px] justify-center">

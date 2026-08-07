@@ -32,7 +32,7 @@ export default function ContactPage() {
             {summitSite.supportPhone && (
               <p>
                 Phone: {" "}
-                <a className="font-semibold text-[var(--navy)] hover:text-[var(--brass)] hover:underline" href={`tel:${summitSite.supportPhone.replace(/\s/g, "")}`}>
+                <a className="font-semibold text-[var(--navy)] hover:text-[var(--brass)] hover:underline" href={`tel:${summitSite.supportPhone.replace(/\s+/g, "")}`}>
                   {summitSite.supportPhone}
                 </a>
               </p>

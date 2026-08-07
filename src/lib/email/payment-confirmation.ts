@@ -113,6 +113,7 @@ export async function sendPaymentConfirmationEmail(
     const paidAt = attempt?.captured_at ?? application.paid_at;
     const testMode = order.key_mode === "test";
     const supportEmail = summitSite.supportEmail;
+    const supportPhone = summitSite.supportPhone;
     const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Industrial Summit`;
     const logoUrl = `${siteUrl()}/investors-summit-2026-logo.png`;
 
@@ -138,6 +139,7 @@ export async function sendPaymentConfirmationEmail(
           registrationReference,
           logoUrl,
           supportEmail,
+          supportPhone,
           testMode,
         }),
         text: renderConfirmationText({
@@ -149,6 +151,7 @@ export async function sendPaymentConfirmationEmail(
           redeemCode: redeemCode?.code_normalized ?? null,
           registrationReference,
           supportEmail,
+          supportPhone,
           testMode,
         }),
       }),
@@ -198,6 +201,7 @@ type TemplateValues = {
   registrationReference: string;
   logoUrl: string;
   supportEmail: string;
+  supportPhone: string;
   testMode: boolean;
 };
 
@@ -231,7 +235,7 @@ function renderConfirmationHtml(values: TemplateValues) {
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">
               ${rows.map(([label, value]) => `<tr><td style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;color:#507080">${escapeHtml(label)}</td><td align="right" style="border-top:1px solid rgba(9,60,84,.16);padding:11px 0;font-weight:bold">${escapeHtml(value)}</td></tr>`).join("")}
             </table>
-            <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Need help with your payment or registration? Email <a href="mailto:${escapeHtml(values.supportEmail)}" style="color:#0c4a66;font-weight:bold">${escapeHtml(values.supportEmail)}</a>.</p>
+            <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Need help with your payment or registration? Email <a href="mailto:${escapeHtml(values.supportEmail)}" style="color:#0c4a66;font-weight:bold">${escapeHtml(values.supportEmail)}</a> or call <a href="tel:${escapeHtml(phoneHref(values.supportPhone))}" style="color:#0c4a66;font-weight:bold">${escapeHtml(values.supportPhone)}</a>.</p>
             <p style="margin:24px 0 0;color:#507080;font-size:13px;line-height:1.6">Keep this email for your records. Venue updates will be sent to your registered email address.</p>
           </td></tr>
         </table>
@@ -255,7 +259,7 @@ function renderConfirmationText(values: Omit<TemplateValues, "logoUrl">) {
     ...(values.redeemCode ? [`Redeem code: ${values.redeemCode}`] : []),
     ...(values.paidAt ? [`Paid on: ${formatDate(values.paidAt)}`] : []),
     "",
-    `Need help with your payment or registration? Email ${values.supportEmail}.`,
+    `Need help with your payment or registration? Email ${values.supportEmail} or call ${values.supportPhone}.`,
   ].join("\n");
 }
 
@@ -286,6 +290,10 @@ function escapeHtml(value: string) {
     };
     return entities[character];
   });
+}
+
+function phoneHref(value: string) {
+  return value.replace(/\s+/g, "");
 }
 
 function siteUrl() {
