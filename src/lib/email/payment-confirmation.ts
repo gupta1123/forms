@@ -113,6 +113,7 @@ export async function sendPaymentConfirmationEmail(
     const testMode = order.key_mode === "test";
     const supportEmail = process.env.EVENT_SUPPORT_EMAIL?.trim();
     const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Jalna Investment Summit`;
+    const logoUrl = `${siteUrl()}/investors-summit-2026-logo.png`;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -134,6 +135,7 @@ export async function sendPaymentConfirmationEmail(
           planName: plan?.name ?? "Investment Summit Pass",
           redeemCode: redeemCode?.code_normalized ?? null,
           registrationReference,
+          logoUrl,
           testMode,
         }),
         text: renderConfirmationText({
@@ -191,6 +193,7 @@ type TemplateValues = {
   planName: string;
   redeemCode: string | null;
   registrationReference: string;
+  logoUrl: string;
   testMode: boolean;
 };
 
@@ -211,9 +214,11 @@ function renderConfirmationHtml(values: TemplateValues) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5fbfb;padding:32px 16px">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #093c54">
+          <tr><td align="center" style="background:#ffffff;padding:22px 30px">
+            <img src="${escapeHtml(values.logoUrl)}" width="520" alt="Investors Summit 2026 — A Jalna First Initiative" style="display:block;width:100%;max-width:520px;height:auto;border:0" />
+          </td></tr>
           <tr><td style="background:#052c3e;color:#f5fbfb;padding:24px 30px">
-            <p style="margin:0;color:#7fc0c8;font-size:12px;letter-spacing:2px;text-transform:uppercase">Jalna Investment Summit</p>
-            <h1 style="margin:10px 0 0;font-family:Georgia,serif;font-size:32px;font-weight:normal">Payment confirmed</h1>
+            <h1 style="margin:0;font-family:Georgia,serif;font-size:32px;font-weight:normal">Payment confirmed</h1>
           </td></tr>
           <tr><td style="padding:30px">
             <p style="margin:0 0 16px;font-size:17px">Hello ${escapeHtml(values.attendeeName)},</p>
@@ -231,7 +236,7 @@ function renderConfirmationHtml(values: TemplateValues) {
 </html>`;
 }
 
-function renderConfirmationText(values: TemplateValues) {
+function renderConfirmationText(values: Omit<TemplateValues, "logoUrl">) {
   return [
     `Hello ${values.attendeeName},`,
     "",
@@ -274,4 +279,11 @@ function escapeHtml(value: string) {
     };
     return entities[character];
   });
+}
+
+function siteUrl() {
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "") ||
+    "https://jalna-investment-summit.netlify.app"
+  );
 }
