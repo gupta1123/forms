@@ -38,7 +38,6 @@ type PaymentOrder = {
   id: number;
   provider_order_id: string | null;
   amount_paise: number;
-  key_mode: "test" | "live";
 };
 
 export default async function ConfirmationPage() {
@@ -69,7 +68,7 @@ export default async function ConfirmationPage() {
       .maybeSingle(),
     supabase
       .from("summit_payment_orders")
-      .select("id, provider_order_id, amount_paise, key_mode")
+      .select("id, provider_order_id, amount_paise")
       .eq("application_id", application.id)
       .eq("status", "paid")
       .order("created_at", { ascending: false })
@@ -138,12 +137,6 @@ export default async function ConfirmationPage() {
               )}
               {paidAt && <ConfirmationItem label="Paid on" value={formatDate(paidAt)} />}
               </dl>
-
-              {order?.key_mode === "test" && (
-                <div className="mt-7 border border-[#0da1a7] bg-[#e7f4f5] px-4 py-3 text-sm text-[#0c4a66]">
-                  This was a Razorpay Test Mode payment. No real money was charged.
-                </div>
-              )}
             </div>
 
             <p className="mx-auto mt-7 max-w-[610px] text-center text-sm leading-6 text-[var(--ink-72)]">
@@ -157,12 +150,6 @@ export default async function ConfirmationPage() {
             </p>
 
             <div className="summit-actions mx-auto max-w-[610px] justify-center">
-              <a
-                className="button-secondary inline-flex h-11 items-center justify-center px-5"
-                href={`mailto:${summitSite.supportEmail}`}
-              >
-                Contact support
-              </a>
               <form action={startAnotherRegistration}>
                 <button className="button-primary h-11 w-full px-5" type="submit">
                   Register another attendee

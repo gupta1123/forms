@@ -27,6 +27,15 @@ type Checkout = {
   has_redeem_code: boolean;
 };
 
+type Registration = {
+  id: number;
+  status: "details_submitted" | "payment_pending" | "paid" | "cancelled";
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function PlansPage({
@@ -47,13 +56,68 @@ export default async function PlansPage({
 
   if (error || !checkout) redirect("/");
 
-  const { data: registration } = await supabase
+  const { data: registrationData } = await supabase
     .from("summit_applications")
-    .select("id, status")
+    .select("id, status, first_name, last_name, email, phone")
     .eq("checkout_token", checkoutToken)
     .maybeSingle();
+  const registration = registrationData as Registration | null;
 
   if (!registration) redirect("/");
+
+  if (registration.status === "paid") {
+    const attendeeName = `${registration.first_name} ${registration.last_name}`.trim();
+
+    return (
+      <main className="summit-app flex flex-col">
+        <SummitHeader activeStep={4} greeting={attendeeName} />
+        <SummitShell activeStep={4}>
+          <section
+            aria-labelledby="paid-registration-title"
+            className="summit-panel"
+          >
+            <div className="summit-confirmation">
+              <span className="summit-success-icon">
+                <PiCheck aria-hidden="true" />
+              </span>
+              <p className="summit-kicker mt-5">Payment already completed</p>
+              <h1 id="paid-registration-title">
+                You&apos;re already <em>registered.</em>
+              </h1>
+              <p className="summit-confirmation-intro">
+                We found a completed payment matching the email address and
+                phone number you entered. No additional payment is required.
+              </p>
+
+              <div className="summit-confirmation-card">
+                <dl className="summit-confirmation-grid">
+                  <PaidRegistrationItem label="Name" value={attendeeName} />
+                  <PaidRegistrationItem
+                    label="Email address"
+                    value={registration.email}
+                  />
+                  <PaidRegistrationItem
+                    label="Phone number"
+                    value={registration.phone}
+                  />
+                </dl>
+              </div>
+
+              <div className="summit-actions mx-auto max-w-[610px] justify-center">
+                <Link
+                  className="button-primary inline-flex h-11 items-center justify-center px-5"
+                  href="/confirmation"
+                >
+                  View payment confirmation
+                </Link>
+              </div>
+            </div>
+          </section>
+        </SummitShell>
+        <SiteFooter />
+      </main>
+    );
+  }
 
   const { count: paymentOrderCount } = await supabase
     .from("summit_payment_orders")
@@ -61,7 +125,6 @@ export default async function PlansPage({
     .eq("application_id", registration.id);
 
   const paymentStarted = (paymentOrderCount ?? 0) > 0;
-  const alreadyPaid = registration.status === "paid";
 
   const { redeemed } = await searchParams;
   const originalPrice = formatRupees(checkout.original_amount_paise);
@@ -83,12 +146,6 @@ export default async function PlansPage({
             {redeemed && (
               <div className="summit-notice is-success" role="status">
                 Redeem code applied. You saved {discount}.
-              </div>
-            )}
-
-            {alreadyPaid && (
-              <div className="summit-notice is-success" role="status">
-                Payment is already completed for this registration. No additional payment is required.
               </div>
             )}
 
@@ -121,7 +178,11 @@ export default async function PlansPage({
                 </ul>
 
                 <div className="summit-redeem">
-                  <RedeemCodeForm applied={checkout.has_redeem_code} locked={paymentStarted || alreadyPaid} paid={alreadyPaid} />
+                  <RedeemCodeForm
+                    applied={checkout.has_redeem_code}
+                    locked={paymentStarted}
+                    paid={false}
+                  />
                 </div>
               </div>
 
@@ -151,11 +212,11 @@ export default async function PlansPage({
                   <p className="summit-total-note">Inclusive of GST. Charged once, at payment.</p>
                 </div>
 
-                <RazorpayCheckout alreadyPaid={alreadyPaid} amountLabel={amountDue} />
+                <RazorpayCheckout alreadyPaid={false} amountLabel={amountDue} />
               </aside>
             </div>
 
-            {!paymentStarted && !alreadyPaid && (
+            {!paymentStarted && (
               <div className="summit-actions">
                 <Link className="summit-quiet-link" href="/">Edit your details</Link>
               </div>
@@ -182,5 +243,20 @@ function PlanFeature({ children }: { children: React.ReactNode }) {
       <PiCheck aria-hidden="true" />
       <span>{children}</span>
     </li>
+  );
+}
+
+function PaidRegistrationItem({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd className="break-words">{value}</dd>
+    </div>
   );
 }
