@@ -148,10 +148,15 @@ function redirectForPaidMatch(
   if (!partialMatch) return;
 
   cookieStore.delete(CHECKOUT_COOKIE_NAME);
+  const matchedByEmail = Boolean(matches.emailMatch);
   setPaidMatchCookie(cookieStore, {
-    kind: matches.emailMatch ? "email" : "phone",
-    maskedEmail: maskEmail(partialMatch.email),
-    maskedPhone: maskPhone(partialMatch.phone),
+    kind: matchedByEmail ? "email" : "phone",
+    maskedEmail: matchedByEmail
+      ? partialMatch.email
+      : maskEmail(partialMatch.email),
+    maskedPhone: matchedByEmail
+      ? maskPhone(partialMatch.phone)
+      : partialMatch.phone,
   });
   redirect("/plans");
 }
