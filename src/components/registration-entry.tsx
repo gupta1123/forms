@@ -69,8 +69,8 @@ function PaidRegistrationLookup() {
           Check your payment status.
         </h2>
         <p className="mt-3 leading-7 text-[var(--ink-72)]">
-          Enter your registered email address, phone number, or both. Entering
-          both matching details gives access to the complete confirmation.
+          Enter the phone number used during registration to check whether the
+          payment is already complete.
         </p>
       </div>
 
@@ -83,16 +83,7 @@ function PaidRegistrationLookup() {
 
         <fieldset className="summit-fieldset">
           <legend className="summit-legend">Find your registration</legend>
-          <div className="summit-field-grid">
-            <LookupField
-              autoComplete="email"
-              defaultValue={state.values?.email}
-              errors={state.errors?.email}
-              label="Email address"
-              name="lookup_email"
-              placeholder="you@company.com"
-              type="email"
-            />
+          <div className="max-w-[520px]">
             <LookupField
               autoComplete="tel"
               defaultValue={state.values?.phone}
@@ -104,8 +95,7 @@ function PaidRegistrationLookup() {
             />
           </div>
           <p className="summit-field-hint mt-4">
-            At least one field is required. Use both to view the full
-            registration confirmation.
+            You may enter the number with or without +91.
           </p>
         </fieldset>
 

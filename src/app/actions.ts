@@ -31,11 +31,9 @@ export type RegistrationState = {
 export type PaidLookupState = {
   message?: string;
   errors?: {
-    email?: string[];
     phone?: string[];
   };
   values?: {
-    email?: string;
     phone?: string;
   };
 };
@@ -58,7 +56,17 @@ function formValues(formData: FormData, name: string) {
 }
 
 function normalizedPhone(value: string) {
-  return value.replace(/\D/g, "");
+  const digits = value.replace(/\D/g, "");
+
+  if (digits.length === 12 && digits.startsWith("91")) {
+    return digits.slice(2);
+  }
+
+  if (digits.length === 11 && digits.startsWith("0")) {
+    return digits.slice(1);
+  }
+
+  return digits;
 }
 
 function setCheckoutCookie(
@@ -165,23 +173,17 @@ export async function lookupPaidRegistration(
   _previousState: PaidLookupState,
   formData: FormData,
 ): Promise<PaidLookupState> {
-  const email = formValue(formData, "lookup_email").trim().toLowerCase();
   const phone = formValue(formData, "lookup_phone").trim();
   const errors: PaidLookupState["errors"] = {};
 
-  if (!email && !phone) {
+  if (!phone) {
     return {
-      message: "Enter your registered email address or phone number.",
+      message: "Enter your registered phone number.",
       errors: {
-        email: ["Enter an email address or phone number."],
-        phone: ["Enter an email address or phone number."],
+        phone: ["Enter your registered phone number."],
       },
-      values: { email, phone },
+      values: { phone },
     };
-  }
-
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = ["Enter a valid email address."];
   }
 
   const submittedPhone = phone ? normalizedPhone(phone) : "";
@@ -189,11 +191,11 @@ export async function lookupPaidRegistration(
     errors.phone = ["Enter a valid phone number."];
   }
 
-  if (errors.email || errors.phone) {
+  if (errors.phone) {
     return {
       message: "Please check the highlighted field.",
       errors,
-      values: { email, phone },
+      values: { phone },
     };
   }
 
@@ -205,11 +207,11 @@ export async function lookupPaidRegistration(
     console.error("Unable to look up summit registration:", error.message);
     return {
       message: "We could not check your registration. Please try again.",
-      values: { email, phone },
+      values: { phone },
     };
   }
 
-  const matches = findPaidMatches(candidates, email, submittedPhone);
+  const matches = findPaidMatches(candidates, "", submittedPhone);
   redirectForPaidMatch(cookieStore, matches);
 
   cookieStore.delete(CHECKOUT_COOKIE_NAME);
@@ -217,8 +219,8 @@ export async function lookupPaidRegistration(
 
   return {
     message:
-      "No paid registration was found with those details. You can register as a new attendee.",
-    values: { email, phone },
+      "No paid registration was found with that phone number. You can register as a new attendee.",
+    values: { phone },
   };
 }
 
