@@ -13,8 +13,13 @@ import {
 } from "@/components/summit-chrome";
 import {
   CHECKOUT_COOKIE_NAME,
+  PAID_MATCH_COOKIE_NAME,
   isCheckoutToken,
 } from "@/lib/summit/constants";
+import {
+  readPaidMatchCookieValue,
+  type PaidMatch,
+} from "@/lib/summit/paid-match";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 type Checkout = {
@@ -45,8 +50,14 @@ export default async function PlansPage({
 }) {
   const cookieStore = await cookies();
   const checkoutToken = cookieStore.get(CHECKOUT_COOKIE_NAME)?.value;
+  const paidMatch = readPaidMatchCookieValue(
+    cookieStore.get(PAID_MATCH_COOKIE_NAME)?.value,
+  );
 
-  if (!isCheckoutToken(checkoutToken)) redirect("/");
+  if (!isCheckoutToken(checkoutToken)) {
+    if (paidMatch) return <PartialPaidRegistration match={paidMatch} />;
+    redirect("/");
+  }
 
   const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase.rpc("get_summit_checkout", {
@@ -258,5 +269,56 @@ function PaidRegistrationItem({
       <dt>{label}</dt>
       <dd className="break-words">{value}</dd>
     </div>
+  );
+}
+
+function PartialPaidRegistration({ match }: { match: PaidMatch }) {
+  const matchedByEmail = match.kind === "email";
+
+  return (
+    <main className="summit-app flex flex-col">
+      <SummitHeader activeStep={4} />
+      <SummitShell activeStep={4}>
+        <section
+          aria-labelledby="partial-paid-registration-title"
+          className="summit-panel"
+        >
+          <div className="summit-confirmation">
+            <span className="summit-success-icon">
+              <PiCheck aria-hidden="true" />
+            </span>
+            <p className="summit-kicker mt-5">Payment already completed</p>
+            <h1 id="partial-paid-registration-title">
+              A registration is already <em>paid.</em>
+            </h1>
+            <p className="summit-confirmation-intro">
+              {matchedByEmail
+                ? "The email address you entered is attached to a completed payment."
+                : "The phone number you entered is attached to a completed payment."}{" "}
+              No additional payment is required.
+            </p>
+
+            <div className="summit-confirmation-card">
+              <dl className="summit-confirmation-grid">
+                <PaidRegistrationItem
+                  label="Registered email"
+                  value={match.maskedEmail}
+                />
+                <PaidRegistrationItem
+                  label="Registered phone"
+                  value={match.maskedPhone}
+                />
+              </dl>
+            </div>
+
+            <p className="mx-auto mt-7 max-w-[610px] text-center text-sm leading-6 text-[var(--ink-72)]">
+              The payment receipt has already been sent to the registered email
+              address.
+            </p>
+          </div>
+        </section>
+      </SummitShell>
+      <SiteFooter />
+    </main>
   );
 }

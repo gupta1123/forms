@@ -6,8 +6,15 @@ import { redirect } from "next/navigation";
 import {
   CHECKOUT_COOKIE_MAX_AGE,
   CHECKOUT_COOKIE_NAME,
+  PAID_MATCH_COOKIE_MAX_AGE,
+  PAID_MATCH_COOKIE_NAME,
   isCheckoutToken,
 } from "@/lib/summit/constants";
+import {
+  createPaidMatchCookieValue,
+  maskEmail,
+  maskPhone,
+} from "@/lib/summit/paid-match";
 import {
   summitRegistrationSchema,
   type RegistrationValues,
@@ -46,6 +53,19 @@ function setCheckoutCookie(
     sameSite: "lax",
     path: "/",
     maxAge: CHECKOUT_COOKIE_MAX_AGE,
+  });
+}
+
+function setPaidMatchCookie(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+  match: Parameters<typeof createPaidMatchCookieValue>[0],
+) {
+  cookieStore.set(PAID_MATCH_COOKIE_NAME, createPaidMatchCookieValue(match), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: PAID_MATCH_COOKIE_MAX_AGE,
   });
 }
 
@@ -141,11 +161,10 @@ export async function submitRegistration(
 
   const { data: paidCandidates, error: paidLookupError } = await supabase
     .from("summit_applications")
-    .select("checkout_token, phone")
-    .eq("email", registration.email.trim().toLowerCase())
+    .select("checkout_token, email, phone")
     .eq("status", "paid")
     .order("paid_at", { ascending: false })
-    .limit(10);
+    .limit(1000);
 
   if (paidLookupError) {
     console.error("Unable to check existing summit payment:", paidLookupError.message);
@@ -155,15 +174,39 @@ export async function submitRegistration(
     };
   }
 
+  const submittedEmail = registration.email.trim().toLowerCase();
   const submittedPhone = normalizedPhone(registration.phone);
-  const paidRegistration = paidCandidates?.find(
-    (candidate) => normalizedPhone(candidate.phone) === submittedPhone,
+  const exactMatch = paidCandidates?.find(
+    (candidate) =>
+      candidate.email.trim().toLowerCase() === submittedEmail &&
+      normalizedPhone(candidate.phone) === submittedPhone,
   );
 
-  if (paidRegistration && isCheckoutToken(paidRegistration.checkout_token)) {
-    setCheckoutCookie(cookieStore, paidRegistration.checkout_token);
+  if (exactMatch && isCheckoutToken(exactMatch.checkout_token)) {
+    cookieStore.delete(PAID_MATCH_COOKIE_NAME);
+    setCheckoutCookie(cookieStore, exactMatch.checkout_token);
     redirect("/plans");
   }
+
+  const emailMatch = paidCandidates?.find(
+    (candidate) => candidate.email.trim().toLowerCase() === submittedEmail,
+  );
+  const phoneMatch = paidCandidates?.find(
+    (candidate) => normalizedPhone(candidate.phone) === submittedPhone,
+  );
+  const partialMatch = emailMatch ?? phoneMatch;
+
+  if (partialMatch) {
+    cookieStore.delete(CHECKOUT_COOKIE_NAME);
+    setPaidMatchCookie(cookieStore, {
+      kind: emailMatch ? "email" : "phone",
+      maskedEmail: maskEmail(partialMatch.email),
+      maskedPhone: maskPhone(partialMatch.phone),
+    });
+    redirect("/plans");
+  }
+
+  cookieStore.delete(PAID_MATCH_COOKIE_NAME);
 
   const { data, error } = await supabase.rpc("save_summit_application", {
     p_first_name: registration.first_name,

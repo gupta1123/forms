@@ -1,5 +1,7 @@
 export const CHECKOUT_COOKIE_NAME = "summit_checkout";
 export const CHECKOUT_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+export const PAID_MATCH_COOKIE_NAME = "summit_paid_match";
+export const PAID_MATCH_COOKIE_MAX_AGE = 60 * 10;
 
 export function isCheckoutToken(value: string | undefined): value is string {
   return Boolean(
