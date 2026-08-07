@@ -7,6 +7,7 @@ import { PiCheck } from "react-icons/pi";
 import { startAnotherRegistration } from "@/app/confirmation/actions";
 import { SiteFooter } from "@/components/site-footer";
 import { SummitHeader, SummitShell } from "@/components/summit-chrome";
+import { sendPaymentConfirmationEmail } from "@/lib/email/payment-confirmation";
 import {
   CHECKOUT_COOKIE_NAME,
   isCheckoutToken,
@@ -55,6 +56,10 @@ export default async function ConfirmationPage() {
 
   if (!application) redirect("/");
   if (application.status !== "paid") redirect("/plans");
+
+  // Also picks up a queued confirmation if the payment webhook completed
+  // before email delivery was configured or a transient provider error occurred.
+  const emailDelivery = await sendPaymentConfirmationEmail(application.id);
 
   const [{ data: plan }, { data: orderData }] = await Promise.all([
     supabase
@@ -114,7 +119,10 @@ export default async function ConfirmationPage() {
             </h1>
             <p className="summit-confirmation-intro">
               Thank you, {attendeeName}. Your summit pass is confirmed and the
-              payment has been recorded.
+              payment has been recorded.{" "}
+              {emailDelivery.status === "sent"
+                ? `A receipt was sent to ${application.email}.`
+                : `A receipt will be sent to ${application.email}.`}
             </p>
 
             <div className="summit-confirmation-card">

@@ -110,8 +110,7 @@ export function SummitSidebar({
         <strong>Your details stay private</strong>
         <p>
           Registration records are used only for summit access, badge printing,
-          payment, and the meetings you request. They are not exposed through
-          any public API.
+          and payment. They are not exposed through any public API.
         </p>
       </div>
     </aside>

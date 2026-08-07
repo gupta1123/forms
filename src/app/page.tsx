@@ -53,8 +53,7 @@ export default async function RegistrationPage() {
             accent="attending?"
             description={
               <>
-                This is what goes on your badge and helps the organisers route
-                your meeting requests. Fields marked
+                This is what goes on your badge. Fields marked
                 <span className="summit-required">*</span> are required.
               </>
             }

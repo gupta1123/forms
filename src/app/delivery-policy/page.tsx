@@ -18,7 +18,7 @@ export default function DeliveryPolicyPage() {
       <section>
         <h2>Registration confirmation</h2>
         <p className="mt-3">
-          After successful payment verification, the website displays a confirmation page with the registration and payment references. The registered email address may also be used for event communications.
+          After successful payment verification, the website displays a confirmation page and emails the registration and payment references to the registered email address. The same address may also be used for event communications.
         </p>
       </section>
 

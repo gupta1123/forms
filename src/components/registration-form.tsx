@@ -8,7 +8,6 @@ import {
   type RegistrationState,
 } from "@/app/actions";
 import {
-  MEETING_OPTIONS,
   PARTICIPATION_PURPOSES,
   SECTOR_OPTIONS,
 } from "@/lib/summit/preferences";
@@ -142,40 +141,6 @@ export function RegistrationForm({
               defaultValue={values.participation_purpose}
               errors={state.errors?.participation_purpose}
             />
-          </div>
-
-          <div className="summit-field-full">
-            <div className="summit-field-label-row">
-              <span className="field-label mb-0">
-                Meetings you&apos;d like us to arrange
-              </span>
-              <span className="summit-optional">Optional</span>
-            </div>
-            <p className="summit-field-hint mb-3">
-              Requests are matched before the summit so the organisers can
-              prepare a useful slot for you.
-            </p>
-            <div className="summit-option-grid">
-              {MEETING_OPTIONS.map((option) => (
-                <label className="summit-option-card" key={option.value}>
-                  <input
-                    defaultChecked={values.meeting_requests.includes(option.value)}
-                    name="meeting_requests"
-                    type="checkbox"
-                    value={option.value}
-                  />
-                  <span>
-                    {option.label}
-                    <small>{option.description}</small>
-                  </span>
-                </label>
-              ))}
-            </div>
-            {state.errors?.meeting_requests?.map((error) => (
-              <p className="summit-error" key={error}>
-                {error}
-              </p>
-            ))}
           </div>
 
           <div className="summit-field-full">

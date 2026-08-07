@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 
+import { sendPaymentConfirmationEmail } from "@/lib/email/payment-confirmation";
 import {
   isSameOriginRequest,
   verifyRazorpayCheckoutSignature,
@@ -98,9 +99,18 @@ export async function POST(request: Request) {
     if (recordError) throw recordError;
 
     const paid = payment.status === "captured";
+    const emailDelivery = paid
+      ? await sendPaymentConfirmationEmail(application.id)
+      : { status: "not_ready" as const };
+
+    if (emailDelivery.status === "failed") {
+      console.error("Payment confirmation email failed:", emailDelivery.error);
+    }
+
     return Response.json(
       {
         paid,
+        emailStatus: emailDelivery.status,
         status: paid ? "paid" : "payment_pending",
         message: paid
           ? "Payment completed successfully."
@@ -115,4 +125,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import { verifyRazorpayWebhookSignature } from "@/lib/payments/security";
 import { fetchRazorpayPayment } from "@/lib/razorpay/server";
+import { sendPaymentConfirmationEmail } from "@/lib/email/payment-confirmation";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export const runtime = "nodejs";
@@ -118,6 +119,13 @@ export async function POST(request: Request) {
     });
     if (recordError) throw recordError;
 
+    if (payment.status === "captured") {
+      const emailDelivery = await sendPaymentConfirmationEmail(order.application_id);
+      if (emailDelivery.status === "failed") {
+        throw new Error("Payment confirmation email failed.");
+      }
+    }
+
     await supabase
       .from("summit_payment_webhook_events")
       .update({
@@ -140,4 +148,3 @@ export async function POST(request: Request) {
     return Response.json({ message: "Webhook processing failed." }, { status: 500 });
   }
 }
-
