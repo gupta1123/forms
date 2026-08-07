@@ -24,11 +24,11 @@ export default async function AdminLoginPage() {
         <div className="relative w-fit rounded-2xl bg-[var(--paper)] p-4 shadow-sm">
           <Image
             alt="Industrial Summit"
-            className="h-auto w-[300px] mix-blend-multiply"
-            height={505}
+            className="h-auto w-[300px]"
+            height={724}
             priority
-            src="/industrailsummitlogo.jpeg"
-            width={1566}
+            src="/industrial-summit-logo-transparent.png"
+            width={2172}
           />
         </div>
         <div className="relative max-w-lg">
@@ -43,11 +43,11 @@ export default async function AdminLoginPage() {
         <div className="w-full max-w-md rounded-[1.75rem] border border-[var(--ink-16)] bg-white p-7 shadow-[0_30px_80px_-55px_rgba(5,44,62,0.42)] sm:p-9">
           <Image
             alt="Industrial Summit"
-            className="mb-7 h-auto w-full max-w-[300px] mix-blend-multiply lg:hidden"
-            height={505}
+            className="mb-7 h-auto w-full max-w-[300px] lg:hidden"
+            height={724}
             priority
-            src="/industrailsummitlogo.jpeg"
-            width={1566}
+            src="/industrial-summit-logo-transparent.png"
+            width={2172}
           />
           <span className="inline-flex rounded-full bg-[var(--paper-deep)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--navy)]">Admin access</span>
           <h2 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Sign in to the dashboard</h2>

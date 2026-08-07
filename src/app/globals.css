@@ -229,7 +229,7 @@ textarea {
   display: block;
   flex: none;
   height: auto;
-  mix-blend-mode: multiply;
+  transform: translateX(clamp(-84px, -4vw, -36px));
   width: 226px;
 }
 
@@ -1013,6 +1013,7 @@ textarea {
 
   .summit-brand-logo {
     height: auto;
+    transform: none;
     width: min(180px, 60vw);
   }
 

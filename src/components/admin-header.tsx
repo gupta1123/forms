@@ -10,11 +10,11 @@ export function AdminHeader({ email }: { email: string }) {
         <Link className="flex min-w-0 items-center gap-3" href="/admin">
           <Image
             alt="Industrial Summit"
-            className="h-auto w-[170px] mix-blend-multiply sm:w-[220px]"
-            height={505}
+            className="h-auto w-[170px] sm:w-[220px]"
+            height={724}
             priority
-            src="/industrailsummitlogo.jpeg"
-            width={1566}
+            src="/industrial-summit-logo-transparent.png"
+            width={2172}
           />
           <span className="hidden rounded-full border border-[var(--ink-16)] bg-[var(--paper)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--navy)] md:inline-flex">
             Admin

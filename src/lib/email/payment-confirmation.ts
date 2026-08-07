@@ -116,7 +116,7 @@ export async function sendPaymentConfirmationEmail(
     const supportPhone = summitSite.supportPhone;
     const eventLocation = summitSite.eventLocation;
     const subject = `${testMode ? "[TEST] " : ""}Payment confirmed — Industrial Summit`;
-    const logoUrl = `${siteUrl()}/industrailsummitlogo.jpeg`;
+    const logoUrl = `${siteUrl()}/industrial-summit-logo-transparent.png`;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
