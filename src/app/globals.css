@@ -211,7 +211,7 @@ textarea {
   align-items: center;
   display: flex;
   gap: 18px;
-  height: 74px;
+  height: 82px;
   margin-inline: auto;
   width: min(1180px, 92vw);
 }
@@ -225,30 +225,11 @@ textarea {
   text-decoration: none;
 }
 
-.summit-brand img {
+.summit-brand-logo {
+  display: block;
   flex: none;
-  height: 40px;
-  width: 40px;
-}
-
-.summit-brand strong {
-  display: block;
-  font-family: var(--font-instrument-serif), Georgia, serif;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
-}
-
-.summit-brand small {
-  color: var(--navy);
-  display: block;
-  font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 8.5px;
-  letter-spacing: 0.24em;
-  line-height: 1;
-  margin-top: 5px;
-  text-transform: uppercase;
+  height: auto;
+  width: 246px;
 }
 
 .summit-greeting {
@@ -1021,7 +1002,7 @@ textarea {
 
   .summit-header-inner {
     gap: 10px;
-    height: 68px;
+    height: 72px;
     width: calc(100% - 32px);
   }
 
@@ -1029,16 +1010,9 @@ textarea {
     min-width: 0;
   }
 
-  .summit-brand img {
-    height: 36px;
-    width: 36px;
-  }
-
-  .summit-brand strong {
-    font-size: 17px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .summit-brand-logo {
+    height: auto;
+    width: min(200px, 62vw);
   }
 
   .summit-secure span,

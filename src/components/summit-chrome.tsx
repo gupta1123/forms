@@ -26,17 +26,13 @@ export function SummitHeader({
         <div className="summit-header-inner">
           <Link className="summit-brand" href="/">
             <Image
-              alt=""
-              aria-hidden="true"
-              height={40}
+              alt="Investors Summit 2026 — A Jalna First Initiative"
+              className="summit-brand-logo"
+              height={660}
               priority
-              src="/jalna-summit-mark.svg"
-              width={40}
+              src="/investors-summit-2026-logo.png"
+              width={2616}
             />
-            <span>
-              <strong>Jalna Investment Summit</strong>
-              <small>Registration</small>
-            </span>
           </Link>
           {greeting && (
             <p className="summit-greeting">
