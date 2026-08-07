@@ -328,11 +328,6 @@ function PartialPaidRegistration({ match }: { match: PaidMatch }) {
               </dl>
             </div>
 
-            <p className="mx-auto mt-7 max-w-[610px] text-center text-sm leading-6 text-[var(--ink-72)]">
-              The payment receipt has already been sent to the registered email
-              address.
-            </p>
-
             <div className="summit-actions mx-auto max-w-[610px] justify-center">
               <form action={startAnotherRegistration}>
                 <button className="button-primary h-11 w-full px-5" type="submit">
