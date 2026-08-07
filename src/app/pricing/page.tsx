@@ -20,7 +20,7 @@ export default function PricingPage() {
         <p className="!text-sm !text-white/60">Investment Summit Pass</p>
         <p className="mt-2 !text-4xl !font-semibold !text-white">₹2,999</p>
         <p className="mt-2 !text-sm !text-white/60">Inclusive of applicable GST</p>
-        <ul className="mt-6 !text-white/75">
+        <ul className="mt-6 marker:text-[var(--steel)] [&_li]:!text-[#dcebed]">
           <li>One attendee registration for the Investment Summit</li>
           <li>Access according to the confirmed event schedule and venue</li>
           <li>Secure payment through Razorpay Checkout</li>
