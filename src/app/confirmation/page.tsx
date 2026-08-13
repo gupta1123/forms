@@ -103,7 +103,7 @@ export default async function ConfirmationPage() {
   ]);
 
   const attendeeName = application.registration_type === "corporate"
-    ? application.first_name
+    ? `${application.first_name} ${application.last_name}`.trim()
     : `${application.first_name} ${application.last_name}`;
   const registrationReference = `IS-${String(application.id).padStart(6, "0")}`;
   const paymentReference =

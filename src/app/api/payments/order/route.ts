@@ -141,7 +141,7 @@ export async function POST(request: Request) {
         amount: localOrder.amount_paise,
         currency: localOrder.currency,
         name: application.registration_type === "corporate"
-          ? application.first_name
+          ? `${application.first_name} ${application.last_name}`.trim()
           : `${application.first_name} ${application.last_name}`,
         email: application.email ?? "",
         contact: application.phone,

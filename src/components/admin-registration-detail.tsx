@@ -40,7 +40,7 @@ export function AdminRegistrationDetail({
               {reference}
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-              {registration.first_name}{registration.registration_type === "individual" ? ` ${registration.last_name}` : ""}
+              {registration.first_name} {registration.last_name}
             </h1>
             <p className="mt-2 text-sm text-white/65">
               Registered {formatDate(registration.created_at)}
@@ -112,7 +112,7 @@ export function AdminRegistrationDetail({
           ) : (
             <DetailCard title="Corporate registration">
               <DefinitionRow label="Company" value={registration.company_name ?? registration.profession} />
-              <DefinitionRow label="Primary contact" value={registration.first_name} />
+              <DefinitionRow label="Primary contact" value={`${registration.first_name} ${registration.last_name}`} />
               <DefinitionRow label="People attending" value={String(registration.attendee_count)} />
             </DetailCard>
           )}

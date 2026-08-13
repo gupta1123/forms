@@ -82,7 +82,7 @@ export default async function PlansPage({
 
   if (registration.status === "paid") {
     const attendeeName = registration.registration_type === "corporate"
-      ? registration.first_name
+      ? `${registration.first_name} ${registration.last_name}`.trim()
       : `${registration.first_name} ${registration.last_name}`.trim();
 
     return (

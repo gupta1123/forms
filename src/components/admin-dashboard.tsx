@@ -241,7 +241,7 @@ function RegistrationRow({ registration }: { registration: AdminRegistration }) 
     <tr className="border-b border-[var(--ink-16)] align-top text-sm last:border-0 hover:bg-[var(--paper)]">
       <td className="px-5 py-4">
         <Link className="font-semibold text-[var(--ink)] hover:text-[var(--brass)]" href={detailHref}>
-          {registration.first_name}{registration.registration_type === "individual" ? ` ${registration.last_name}` : ""}
+          {registration.first_name} {registration.last_name}
         </Link>
         <p className="mt-1 font-mono text-[11px] text-[var(--ink-48)]">
           IS-{String(registration.application_id).padStart(6, "0")}

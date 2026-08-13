@@ -397,7 +397,8 @@ export async function submitCorporateRegistration(
   formData: FormData,
 ): Promise<CorporateRegistrationState> {
   const submittedValues = {
-    contact_name: formValue(formData, "contact_name"),
+    first_name: formValue(formData, "first_name"),
+    last_name: formValue(formData, "last_name"),
     phone: formValue(formData, "phone"),
     company_name: formValue(formData, "company_name"),
     attendee_count: formValue(formData, "attendee_count"),
@@ -410,13 +411,15 @@ export async function submitCorporateRegistration(
     return {
       message: "Please check the highlighted fields.",
       errors: {
-        contact_name: fieldErrors.contact_name,
+        first_name: fieldErrors.first_name,
+        last_name: fieldErrors.last_name,
         phone: fieldErrors.phone,
         company_name: fieldErrors.company_name,
         attendee_count: fieldErrors.attendee_count,
       },
       values: {
-        contact_name: submittedValues.contact_name,
+        first_name: submittedValues.first_name,
+        last_name: submittedValues.last_name,
         phone: submittedValues.phone,
         company_name: submittedValues.company_name,
         attendee_count: Number(submittedValues.attendee_count) || 2,
@@ -425,7 +428,8 @@ export async function submitCorporateRegistration(
   }
 
   const registration: CorporateRegistrationValues = {
-    contact_name: parsed.data.contact_name,
+    first_name: parsed.data.first_name,
+    last_name: parsed.data.last_name,
     phone: parsed.data.phone,
     company_name: parsed.data.company_name,
     attendee_count: parsed.data.attendee_count,
@@ -466,7 +470,8 @@ export async function submitCorporateRegistration(
   cookieStore.delete(PAID_MATCH_COOKIE_NAME);
 
   const { data, error } = await supabase.rpc("save_summit_corporate_application", {
-    p_contact_name: registration.contact_name,
+    p_first_name: registration.first_name,
+    p_last_name: registration.last_name,
     p_phone: registration.phone,
     p_company_name: registration.company_name,
     p_attendee_count: registration.attendee_count,

@@ -62,7 +62,8 @@ export const redeemCodeSchema = z.object({
 });
 
 export const corporateRegistrationSchema = z.object({
-  contact_name: requiredText("Name", 160),
+  first_name: requiredText("First name", 80),
+  last_name: requiredText("Last name", 80),
   phone: z
     .string()
     .trim()

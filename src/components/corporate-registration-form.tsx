@@ -10,7 +10,8 @@ import {
 import type { CorporateRegistrationValues } from "@/lib/summit/validation";
 
 const emptyValues: CorporateRegistrationValues = {
-  contact_name: "",
+  first_name: "",
+  last_name: "",
   phone: "",
   company_name: "",
   attendee_count: 2,
@@ -59,12 +60,20 @@ export function CorporateRegistrationForm({
         <legend className="summit-legend">Corporate contact</legend>
         <div className="summit-field-grid">
           <CorporateField
-            autoComplete="name"
-            defaultValue={values.contact_name}
-            errors={state.errors?.contact_name}
-            label="Name"
-            name="contact_name"
-            placeholder="Primary contact name"
+            autoComplete="given-name"
+            defaultValue={values.first_name}
+            errors={state.errors?.first_name}
+            label="First name"
+            name="first_name"
+            placeholder="Primary contact first name"
+          />
+          <CorporateField
+            autoComplete="family-name"
+            defaultValue={values.last_name}
+            errors={state.errors?.last_name}
+            label="Last name"
+            name="last_name"
+            placeholder="Primary contact last name"
           />
           <CorporateField
             autoComplete="tel"

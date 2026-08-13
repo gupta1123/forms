@@ -38,7 +38,7 @@ export default async function RegistrationPage({
     const supabase = createSupabaseServiceClient();
     const { data: application } = await supabase
       .from("summit_applications")
-      .select("status, registration_type, first_name, phone, company_name, attendee_count")
+      .select("status, registration_type, first_name, last_name, phone, company_name, attendee_count")
       .eq("checkout_token", checkoutToken)
       .maybeSingle();
 
@@ -48,7 +48,8 @@ export default async function RegistrationPage({
       registrationType = application.registration_type === "corporate" ? "corporate" : "individual";
       if (registrationType === "corporate") {
         corporateInitialValues = {
-          contact_name: application.first_name,
+          first_name: application.first_name,
+          last_name: application.last_name,
           phone: application.phone,
           company_name: application.company_name ?? "",
           attendee_count: application.attendee_count ?? 2,
