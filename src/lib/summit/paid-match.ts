@@ -10,6 +10,9 @@ export type PaidMatch = {
   kind: PaidMatchKind;
   maskedEmail: string;
   maskedPhone: string;
+  registrationType: "individual" | "corporate";
+  companyName: string | null;
+  attendeeCount: number;
 };
 
 type SignedPaidMatch = PaidMatch & {
@@ -55,6 +58,9 @@ export function readPaidMatchCookieValue(value: string | undefined): PaidMatch |
       (payload.kind !== "email" && payload.kind !== "phone") ||
       typeof payload.maskedEmail !== "string" ||
       typeof payload.maskedPhone !== "string" ||
+      (payload.registrationType !== "individual" && payload.registrationType !== "corporate") ||
+      (payload.companyName !== null && typeof payload.companyName !== "string") ||
+      typeof payload.attendeeCount !== "number" ||
       typeof payload.expiresAt !== "number" ||
       payload.expiresAt <= Date.now()
     ) {
@@ -65,6 +71,9 @@ export function readPaidMatchCookieValue(value: string | undefined): PaidMatch |
       kind: payload.kind,
       maskedEmail: payload.maskedEmail,
       maskedPhone: payload.maskedPhone,
+      registrationType: payload.registrationType,
+      companyName: payload.companyName,
+      attendeeCount: payload.attendeeCount,
     };
   } catch {
     return null;

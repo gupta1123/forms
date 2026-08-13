@@ -10,6 +10,7 @@ import type {
   AdminRegistration,
 } from "@/lib/admin/types";
 import { decodeSummitPreferences } from "@/lib/summit/preferences";
+import { getAdminRegistrationExportRows } from "@/lib/admin/data";
 
 const adminLoginSchema = z.object({
   identifier: z.string().trim().min(1, "Enter your username or email."),
@@ -132,16 +133,7 @@ export async function getAdminRegistrationExport(
     throw new Error("Administrator access is required.");
   }
 
-  const { data, error } = await supabase.rpc("get_summit_admin_dashboard", {
-    p_limit: 1000,
-  });
-  if (error || !data) {
-    throw new Error("The registration export could not be loaded.");
-  }
-
-  const registrations = (
-    data as { registrations: AdminRegistration[] }
-  ).registrations;
+  const registrations: AdminRegistration[] = await getAdminRegistrationExportRows();
   const normalisedSearch = filters.search.toLowerCase();
 
   return registrations
@@ -154,7 +146,8 @@ export async function getAdminRegistrationExport(
         [
           registration.first_name,
           registration.last_name,
-          registration.email,
+          registration.email ?? "",
+          registration.company_name ?? "",
           registration.phone,
           registration.industry,
           registration.profession,

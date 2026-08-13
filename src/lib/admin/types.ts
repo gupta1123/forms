@@ -13,10 +13,13 @@ export type ProviderPaymentStatus =
 
 export type AdminRegistration = {
   application_id: number;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
   first_name: string;
   last_name: string;
   phone: string;
-  email: string;
+  email: string | null;
   industry: string;
   profession: string;
   designation: string;

@@ -8,17 +8,25 @@ import {
   lookupPaidRegistration,
   type PaidLookupState,
 } from "@/app/actions";
+import { CorporateRegistrationForm } from "@/components/corporate-registration-form";
 import { RegistrationForm } from "@/components/registration-form";
-import type { RegistrationValues } from "@/lib/summit/validation";
+import type {
+  CorporateRegistrationValues,
+  RegistrationValues,
+} from "@/lib/summit/validation";
 
 const initialLookupState: PaidLookupState = {};
 
 export function RegistrationEntry({
   initialValues,
+  corporateInitialValues,
   lookupMode,
+  registrationType,
 }: {
   initialValues?: Partial<RegistrationValues> | null;
+  corporateInitialValues?: Partial<CorporateRegistrationValues> | null;
   lookupMode: boolean;
+  registrationType: "individual" | "corporate";
 }) {
   if (lookupMode) return <PaidRegistrationLookup />;
 
@@ -42,8 +50,56 @@ export function RegistrationEntry({
         </Link>
       </div>
 
-      <RegistrationForm initialValues={initialValues} />
+      <div className="mb-8 grid gap-3 sm:grid-cols-2" aria-label="Registration type">
+        <RegistrationTypeLink
+          active={registrationType === "individual"}
+          description="Register one attendee with the existing full form."
+          href="/?registration=individual"
+          title="Individual registration"
+        />
+        <RegistrationTypeLink
+          active={registrationType === "corporate"}
+          description="Register a company group of two or more people."
+          href="/?registration=corporate"
+          title="Corporate registration"
+        />
+      </div>
+
+      {registrationType === "corporate" ? (
+        <CorporateRegistrationForm initialValues={corporateInitialValues} />
+      ) : (
+        <RegistrationForm initialValues={initialValues} />
+      )}
     </>
+  );
+}
+
+function RegistrationTypeLink({
+  active,
+  description,
+  href,
+  title,
+}: {
+  active: boolean;
+  description: string;
+  href: string;
+  title: string;
+}) {
+  return (
+    <Link
+      aria-current={active ? "page" : undefined}
+      className={`border p-5 transition ${
+        active
+          ? "border-[var(--navy)] bg-[var(--navy)] text-white"
+          : "border-[var(--ink-16)] bg-white text-[var(--ink)] hover:border-[var(--navy)]"
+      }`}
+      href={href}
+    >
+      <span className="font-semibold">{title}</span>
+      <span className={`mt-1 block text-sm leading-6 ${active ? "text-white/75" : "text-[var(--ink-72)]"}`}>
+        {description}
+      </span>
+    </Link>
   );
 }
 

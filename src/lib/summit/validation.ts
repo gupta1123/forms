@@ -61,7 +61,28 @@ export const redeemCodeSchema = z.object({
     .regex(/^[A-Za-z0-9_-]+$/, "Enter a valid redeem code."),
 });
 
+export const corporateRegistrationSchema = z.object({
+  contact_name: requiredText("Name", 160),
+  phone: z
+    .string()
+    .trim()
+    .min(7, "Enter a valid phone number.")
+    .max(30, "Enter a valid phone number.")
+    .regex(/^[0-9+() .-]+$/, "Enter a valid phone number."),
+  company_name: requiredText("Company name"),
+  attendee_count: z.coerce
+    .number()
+    .int("Enter a whole number of people.")
+    .min(2, "Corporate registration requires at least 2 people."),
+  website: z.string().max(0).optional(),
+});
+
 export type RegistrationValues = Omit<
   z.infer<typeof summitRegistrationSchema>,
+  "website"
+>;
+
+export type CorporateRegistrationValues = Omit<
+  z.infer<typeof corporateRegistrationSchema>,
   "website"
 >;

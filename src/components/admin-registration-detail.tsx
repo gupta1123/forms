@@ -40,7 +40,7 @@ export function AdminRegistrationDetail({
               {reference}
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-              {registration.first_name} {registration.last_name}
+              {registration.first_name}{registration.registration_type === "individual" ? ` ${registration.last_name}` : ""}
             </h1>
             <p className="mt-2 text-sm text-white/65">
               Registered {formatDate(registration.created_at)}
@@ -54,13 +54,15 @@ export function AdminRegistrationDetail({
 
         <div className="grid gap-5 p-5 sm:p-7 xl:grid-cols-3">
           <DetailCard icon={<PiUser />} title="Attendee details">
-            <DefinitionRow label="Email" value={registration.email} />
+            <DefinitionRow label="Registration type" value={registration.registration_type === "corporate" ? "Corporate" : "Individual"} />
+            <DefinitionRow label="People attending" value={String(registration.attendee_count)} />
+            <DefinitionRow label="Email" value={registration.email ?? "Not collected"} />
             <DefinitionRow label="Phone" value={registration.phone} />
             <DefinitionRow label="Place" value={registration.place} />
           </DetailCard>
 
           <DetailCard icon={<PiIdentificationCard />} title="Professional profile">
-            <DefinitionRow label="Organisation / profession" value={registration.profession} />
+            <DefinitionRow label="Organisation / profession" value={registration.company_name ?? registration.profession} />
             <DefinitionRow label="Designation" value={registration.designation} />
             <DefinitionRow label="Industry" value={registration.industry} />
           </DetailCard>
@@ -92,6 +94,7 @@ export function AdminRegistrationDetail({
         </div>
 
         <div className="grid gap-5 border-t border-[var(--ink-16)] bg-[var(--paper)] p-5 sm:p-7 xl:grid-cols-2">
+          {registration.registration_type === "individual" ? (
           <DetailCard title="Summit preferences">
             <DefinitionRow
               label="Participation purpose"
@@ -106,6 +109,13 @@ export function AdminRegistrationDetail({
               value={preferences.notes || "Not provided"}
             />
           </DetailCard>
+          ) : (
+            <DetailCard title="Corporate registration">
+              <DefinitionRow label="Company" value={registration.company_name ?? registration.profession} />
+              <DefinitionRow label="Primary contact" value={registration.first_name} />
+              <DefinitionRow label="People attending" value={String(registration.attendee_count)} />
+            </DetailCard>
+          )}
 
           <DetailCard title="Registration timeline">
             <DefinitionRow label="Created" value={formatDate(registration.created_at)} />

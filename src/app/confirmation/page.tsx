@@ -26,7 +26,10 @@ type Application = {
   id: number;
   first_name: string;
   last_name: string;
-  email: string;
+  email: string | null;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
   amount_due_paise: number;
   status: "details_submitted" | "payment_pending" | "paid" | "cancelled";
   paid_at: string | null;
@@ -48,7 +51,7 @@ export default async function ConfirmationPage() {
   const supabase = createSupabaseServiceClient();
   const { data: applicationData } = await supabase
     .from("summit_applications")
-    .select("id, first_name, last_name, email, amount_due_paise, status, paid_at, plan_id, redeem_code_id")
+    .select("id, first_name, last_name, email, registration_type, company_name, attendee_count, amount_due_paise, status, paid_at, plan_id, redeem_code_id")
     .eq("checkout_token", checkoutToken)
     .maybeSingle();
   const application = applicationData as Application | null;
@@ -58,7 +61,9 @@ export default async function ConfirmationPage() {
 
   // Also picks up a queued confirmation if the payment webhook completed
   // before email delivery was configured or a transient provider error occurred.
-  const emailDelivery = await sendPaymentConfirmationEmail(application.id);
+  const emailDelivery = application.email
+    ? await sendPaymentConfirmationEmail(application.id)
+    : null;
 
   const [{ data: plan }, { data: orderData }] = await Promise.all([
     supabase
@@ -97,7 +102,9 @@ export default async function ConfirmationPage() {
       : Promise.resolve({ data: null }),
   ]);
 
-  const attendeeName = `${application.first_name} ${application.last_name}`;
+  const attendeeName = application.registration_type === "corporate"
+    ? application.first_name
+    : `${application.first_name} ${application.last_name}`;
   const registrationReference = `IS-${String(application.id).padStart(6, "0")}`;
   const paymentReference =
     attempt?.provider_payment_id ?? order?.provider_order_id ?? "Confirmed";
@@ -119,9 +126,11 @@ export default async function ConfirmationPage() {
             <p className="summit-confirmation-intro">
               Thank you, {attendeeName}. Your summit pass is confirmed and the
               payment has been recorded.{" "}
-              {emailDelivery.status === "sent"
-                ? `A receipt was sent to ${application.email}.`
-                : `A receipt will be sent to ${application.email}.`}
+              {application.email && emailDelivery
+                ? emailDelivery.status === "sent"
+                  ? `A receipt was sent to ${application.email}.`
+                  : `A receipt will be sent to ${application.email}.`
+                : "Your corporate registration includes all attendees shown below."}
             </p>
 
             <div className="summit-confirmation-card">
@@ -131,7 +140,13 @@ export default async function ConfirmationPage() {
               <ConfirmationItem label="Summit pass" value={plan?.name ?? "Industrial Summit Pass"} />
               <ConfirmationItem label="Venue" value={summitSite.eventLocation} />
               <ConfirmationItem label="Amount paid" value={formatRupees(order?.amount_paise ?? application.amount_due_paise)} />
-              <ConfirmationItem label="Registered email" value={application.email} />
+              {application.email && <ConfirmationItem label="Registered email" value={application.email} />}
+              {application.registration_type === "corporate" && (
+                <>
+                  <ConfirmationItem label="Company" value={application.company_name ?? "Corporate registration"} />
+                  <ConfirmationItem label="People attending" value={String(application.attendee_count)} />
+                </>
+              )}
               <ConfirmationItem label="Payment method" value={formatPaymentMethod(attempt?.method)} />
               {redeemCode?.code_normalized && (
                 <ConfirmationItem label="Redeem code" value={redeemCode.code_normalized} />

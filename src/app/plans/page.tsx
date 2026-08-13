@@ -38,8 +38,11 @@ type Registration = {
   status: "details_submitted" | "payment_pending" | "paid" | "cancelled";
   first_name: string;
   last_name: string;
-  email: string;
+  email: string | null;
   phone: string;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
 };
 
 export const dynamic = "force-dynamic";
@@ -70,7 +73,7 @@ export default async function PlansPage({
 
   const { data: registrationData } = await supabase
     .from("summit_applications")
-    .select("id, status, first_name, last_name, email, phone")
+    .select("id, status, first_name, last_name, email, phone, registration_type, company_name, attendee_count")
     .eq("checkout_token", checkoutToken)
     .maybeSingle();
   const registration = registrationData as Registration | null;
@@ -78,7 +81,9 @@ export default async function PlansPage({
   if (!registration) redirect("/");
 
   if (registration.status === "paid") {
-    const attendeeName = `${registration.first_name} ${registration.last_name}`.trim();
+    const attendeeName = registration.registration_type === "corporate"
+      ? registration.first_name
+      : `${registration.first_name} ${registration.last_name}`.trim();
 
     return (
       <main className="summit-app flex flex-col">
@@ -97,21 +102,26 @@ export default async function PlansPage({
                 You&apos;re already <em>registered.</em>
               </h1>
               <p className="summit-confirmation-intro">
-                We found a completed payment matching the email address and
-                phone number you entered. No additional payment is required.
+                We found a completed payment matching the phone number you
+                entered. No additional payment is required.
               </p>
 
               <div className="summit-confirmation-card">
                 <dl className="summit-confirmation-grid">
                   <PaidRegistrationItem label="Name" value={attendeeName} />
-                  <PaidRegistrationItem
-                    label="Email address"
-                    value={registration.email}
-                  />
+                  {registration.email && (
+                    <PaidRegistrationItem label="Email address" value={registration.email} />
+                  )}
                   <PaidRegistrationItem
                     label="Phone number"
                     value={registration.phone}
                   />
+                  {registration.registration_type === "corporate" && (
+                    <>
+                      <PaidRegistrationItem label="Company" value={registration.company_name ?? "Corporate registration"} />
+                      <PaidRegistrationItem label="People attending" value={String(registration.attendee_count)} />
+                    </>
+                  )}
                 </dl>
               </div>
 
@@ -150,6 +160,7 @@ export default async function PlansPage({
   const originalPrice = formatRupees(checkout.original_amount_paise);
   const amountDue = formatRupees(checkout.amount_due_paise);
   const discount = formatRupees(checkout.discount_amount_paise);
+  const isCorporate = registration.registration_type === "corporate";
 
   return (
     <main className="summit-app flex flex-col">
@@ -158,7 +169,9 @@ export default async function PlansPage({
         <section aria-labelledby="summit-panel-title" className="summit-panel">
           <SummitPanelHeader
             accent="summit pass."
-            description="One pass covers the summit. Apply your redeem code before starting payment."
+            description={isCorporate
+              ? `Your total covers ${registration.attendee_count} full-price summit passes. Redeem codes do not apply.`
+              : "One pass covers the summit. Apply your redeem code before starting payment."}
             step="Step 2 of 3"
             title="Your"
           />
@@ -173,7 +186,7 @@ export default async function PlansPage({
               <div className="summit-pass-main">
                 <span className="summit-pass-badge">
                   <PiSealCheck aria-hidden="true" />
-                  Full-day access
+                  {isCorporate ? `${registration.attendee_count} attendee passes` : "Full-day access"}
                 </span>
                 <h3>{checkout.plan_name}</h3>
                 <p className="summit-pass-description">
@@ -197,19 +210,28 @@ export default async function PlansPage({
                   <PlanFeature>GST included in the displayed price</PlanFeature>
                 </ul>
 
-                <div className="summit-redeem">
-                  <RedeemCodeForm
-                    applied={checkout.has_redeem_code}
-                    locked={paymentStarted}
-                    paid={false}
-                  />
-                </div>
+                {isCorporate ? (
+                  <div className="summit-redeem">
+                    <p className="font-semibold text-[var(--navy)]">Corporate pricing</p>
+                    <p className="mt-1 text-sm leading-6 text-[var(--ink-72)]">
+                      Full pass price per attendee. Redeem codes are not available for corporate registrations.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="summit-redeem">
+                    <RedeemCodeForm
+                      applied={checkout.has_redeem_code}
+                      locked={paymentStarted}
+                      paid={false}
+                    />
+                  </div>
+                )}
               </div>
 
               <aside className="summit-order-summary">
                 <h3>Order summary</h3>
                 <div className="summit-price-row">
-                  <span>Summit pass × 1</span>
+                  <span>Summit pass × {registration.attendee_count}</span>
                   <strong>{originalPrice}</strong>
                 </div>
                 {checkout.discount_amount_paise > 0 && (
@@ -325,6 +347,12 @@ function PartialPaidRegistration({ match }: { match: PaidMatch }) {
                   }
                   value={match.maskedPhone}
                 />
+                {match.registrationType === "corporate" && (
+                  <>
+                    <PaidRegistrationItem label="Company" value={match.companyName ?? "Corporate registration"} />
+                    <PaidRegistrationItem label="People attending" value={String(match.attendeeCount)} />
+                  </>
+                )}
               </dl>
             </div>
 

@@ -241,20 +241,25 @@ function RegistrationRow({ registration }: { registration: AdminRegistration }) 
     <tr className="border-b border-[var(--ink-16)] align-top text-sm last:border-0 hover:bg-[var(--paper)]">
       <td className="px-5 py-4">
         <Link className="font-semibold text-[var(--ink)] hover:text-[var(--brass)]" href={detailHref}>
-          {registration.first_name} {registration.last_name}
+          {registration.first_name}{registration.registration_type === "individual" ? ` ${registration.last_name}` : ""}
         </Link>
         <p className="mt-1 font-mono text-[11px] text-[var(--ink-48)]">
           IS-{String(registration.application_id).padStart(6, "0")}
         </p>
+        <p className="mt-1 text-xs font-semibold capitalize text-[var(--brass)]">
+          {registration.registration_type} · {registration.attendee_count} {registration.attendee_count === 1 ? "person" : "people"}
+        </p>
       </td>
       <td className="px-5 py-4 text-[var(--ink-72)]">
-        <p>{registration.email}</p>
+        <p>{registration.email ?? "No email collected"}</p>
         <p className="mt-1">{registration.phone}</p>
       </td>
       <td className="px-5 py-4">
-        <p className="font-medium text-[var(--ink)]">{registration.profession}</p>
+        <p className="font-medium text-[var(--ink)]">{registration.company_name ?? registration.profession}</p>
         <p className="mt-1 text-[var(--ink-72)]">
-          {registration.designation} · {registration.industry}
+          {registration.registration_type === "corporate"
+            ? "Corporate registration"
+            : `${registration.designation} · ${registration.industry}`}
         </p>
       </td>
       <td className="px-5 py-4 text-[var(--ink-72)]">{registration.place}</td>
@@ -285,7 +290,7 @@ function RegistrationRow({ registration }: { registration: AdminRegistration }) 
       </td>
       <td className="px-5 py-4 text-right">
         <Link
-          aria-label={`View ${registration.first_name} ${registration.last_name}`}
+          aria-label={`View ${registration.first_name}`}
           className="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--ink-16)] text-[var(--navy)] transition hover:border-[var(--navy)] hover:bg-[var(--paper-deep)]"
           href={detailHref}
         >

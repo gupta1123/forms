@@ -18,7 +18,10 @@ type ApplicationRow = {
   first_name: string;
   last_name: string;
   phone: string;
-  email: string;
+  email: string | null;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
   amount_due_paise: number;
   status: "details_submitted" | "payment_pending" | "paid" | "cancelled";
 };
@@ -47,7 +50,7 @@ export async function POST(request: Request) {
     const supabase = createSupabaseServiceClient();
     const { data: applicationData, error: applicationError } = await supabase
       .from("summit_applications")
-      .select("id, first_name, last_name, phone, email, amount_due_paise, status")
+      .select("id, first_name, last_name, phone, email, registration_type, company_name, attendee_count, amount_due_paise, status")
       .eq("checkout_token", checkoutToken)
       .maybeSingle();
     const application = applicationData as ApplicationRow | null;
@@ -137,10 +140,14 @@ export async function POST(request: Request) {
         orderId: providerOrderId,
         amount: localOrder.amount_paise,
         currency: localOrder.currency,
-        name: `${application.first_name} ${application.last_name}`,
-        email: application.email,
+        name: application.registration_type === "corporate"
+          ? application.first_name
+          : `${application.first_name} ${application.last_name}`,
+        email: application.email ?? "",
         contact: application.phone,
-        description: "Industrial Summit Pass",
+        description: application.registration_type === "corporate"
+          ? `Industrial Summit Pass × ${application.attendee_count}`
+          : "Industrial Summit Pass",
       },
       { headers: { "Cache-Control": "private, no-store" } },
     );

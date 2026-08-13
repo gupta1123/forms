@@ -16,10 +16,13 @@ const ADMIN_PAGE_SIZE = 20;
 
 type ApplicationRow = {
   id: number;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
   first_name: string;
   last_name: string;
   phone: string;
-  email: string;
+  email: string | null;
   industry: string;
   profession: string;
   designation: string;
@@ -58,7 +61,7 @@ type PaymentAttemptRow = AdminPaymentAttempt & {
 };
 
 const applicationColumns =
-  "id, first_name, last_name, phone, email, industry, profession, designation, place, summit_expectations, plan_id, redeem_code_id, original_amount_paise, amount_due_paise, status, paid_at, created_at, updated_at";
+  "id, registration_type, company_name, attendee_count, first_name, last_name, phone, email, industry, profession, designation, place, summit_expectations, plan_id, redeem_code_id, original_amount_paise, amount_due_paise, status, paid_at, created_at, updated_at";
 
 export async function getAdminRegistrationPage(filters: AdminListFilters): Promise<{
   registrations: AdminRegistration[];
@@ -87,6 +90,7 @@ export async function getAdminRegistrationPage(filters: AdminListFilters): Promi
     const searchExpression = [
       "first_name",
       "last_name",
+      "company_name",
       "email",
       "phone",
       "industry",
@@ -282,6 +286,18 @@ export async function getAdminRegistrationDetail(
   };
 }
 
+export async function getAdminRegistrationExportRows() {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("summit_applications")
+    .select(applicationColumns)
+    .order("id", { ascending: false })
+    .limit(1000);
+
+  if (error) throw new Error("The registration export could not be loaded.");
+  return hydrateRegistrations(supabase, (data ?? []) as ApplicationRow[]);
+}
+
 async function hydrateRegistrations(
   supabase: ReturnType<typeof createSupabaseServiceClient>,
   applications: ApplicationRow[],
@@ -383,6 +399,9 @@ function toAdminRegistration(
 ): AdminRegistration {
   return {
     application_id: application.id,
+    registration_type: application.registration_type,
+    company_name: application.company_name,
+    attendee_count: application.attendee_count,
     first_name: application.first_name,
     last_name: application.last_name,
     phone: application.phone,

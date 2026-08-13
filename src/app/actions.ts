@@ -16,7 +16,9 @@ import {
   maskPhone,
 } from "@/lib/summit/paid-match";
 import {
+  corporateRegistrationSchema,
   summitRegistrationSchema,
+  type CorporateRegistrationValues,
   type RegistrationValues,
 } from "@/lib/summit/validation";
 import { encodeSummitPreferences } from "@/lib/summit/preferences";
@@ -26,6 +28,12 @@ export type RegistrationState = {
   message?: string;
   errors?: Partial<Record<keyof RegistrationValues, string[]>>;
   values?: Partial<RegistrationValues>;
+};
+
+export type CorporateRegistrationState = {
+  message?: string;
+  errors?: Partial<Record<keyof CorporateRegistrationValues, string[]>>;
+  values?: Partial<CorporateRegistrationValues>;
 };
 
 export type PaidLookupState = {
@@ -40,8 +48,11 @@ export type PaidLookupState = {
 
 type PaidCandidate = {
   checkout_token: string | null;
-  email: string;
+  email: string | null;
   phone: string;
+  registration_type: "individual" | "corporate";
+  company_name: string | null;
+  attendee_count: number;
 };
 
 function formValue(formData: FormData, name: string) {
@@ -100,7 +111,7 @@ async function loadPaidCandidates(
 ) {
   const { data, error } = await supabase
     .from("summit_applications")
-    .select("checkout_token, email, phone")
+    .select("checkout_token, email, phone, registration_type, company_name, attendee_count")
     .eq("status", "paid")
     .order("paid_at", { ascending: false })
     .limit(1000);
@@ -119,7 +130,7 @@ function findPaidMatches(
   const emailMatch = submittedEmail
     ? candidates.find(
         (candidate) =>
-          candidate.email.trim().toLowerCase() === submittedEmail,
+          candidate.email?.trim().toLowerCase() === submittedEmail,
       )
     : undefined;
   const phoneMatch = submittedPhone
@@ -131,7 +142,7 @@ function findPaidMatches(
     submittedEmail && submittedPhone
       ? candidates.find(
           (candidate) =>
-            candidate.email.trim().toLowerCase() === submittedEmail &&
+            candidate.email?.trim().toLowerCase() === submittedEmail &&
             normalizedPhone(candidate.phone) === submittedPhone,
         )
       : undefined;
@@ -159,12 +170,17 @@ function redirectForPaidMatch(
   const matchedByEmail = Boolean(matches.emailMatch);
   setPaidMatchCookie(cookieStore, {
     kind: matchedByEmail ? "email" : "phone",
-    maskedEmail: matchedByEmail
-      ? partialMatch.email
-      : maskEmail(partialMatch.email),
+    maskedEmail: partialMatch.email
+      ? matchedByEmail
+        ? partialMatch.email
+        : maskEmail(partialMatch.email)
+      : "Not collected for corporate registration",
     maskedPhone: matchedByEmail
       ? maskPhone(partialMatch.phone)
       : partialMatch.phone,
+    registrationType: partialMatch.registration_type,
+    companyName: partialMatch.company_name,
+    attendeeCount: partialMatch.attendee_count,
   });
   redirect("/plans");
 }
@@ -293,12 +309,15 @@ export async function submitRegistration(
   if (existingToken) {
     const { data: existingApplication } = await supabase
       .from("summit_applications")
-      .select("status")
+      .select("status, registration_type")
       .eq("checkout_token", existingToken)
       .maybeSingle();
 
     if (existingApplication?.status === "payment_pending") redirect("/plans");
-    if (existingApplication?.status === "details_submitted") {
+    if (
+      existingApplication?.status === "details_submitted" &&
+      existingApplication.registration_type !== "corporate"
+    ) {
       editableToken = existingToken;
     }
   }
@@ -370,5 +389,98 @@ export async function submitRegistration(
 
   setCheckoutCookie(cookieStore, data);
 
+  redirect("/plans");
+}
+
+export async function submitCorporateRegistration(
+  _previousState: CorporateRegistrationState,
+  formData: FormData,
+): Promise<CorporateRegistrationState> {
+  const submittedValues = {
+    contact_name: formValue(formData, "contact_name"),
+    phone: formValue(formData, "phone"),
+    company_name: formValue(formData, "company_name"),
+    attendee_count: formValue(formData, "attendee_count"),
+    website: formValue(formData, "website"),
+  };
+  const parsed = corporateRegistrationSchema.safeParse(submittedValues);
+
+  if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
+    return {
+      message: "Please check the highlighted fields.",
+      errors: {
+        contact_name: fieldErrors.contact_name,
+        phone: fieldErrors.phone,
+        company_name: fieldErrors.company_name,
+        attendee_count: fieldErrors.attendee_count,
+      },
+      values: {
+        contact_name: submittedValues.contact_name,
+        phone: submittedValues.phone,
+        company_name: submittedValues.company_name,
+        attendee_count: Number(submittedValues.attendee_count) || 2,
+      },
+    };
+  }
+
+  const registration: CorporateRegistrationValues = {
+    contact_name: parsed.data.contact_name,
+    phone: parsed.data.phone,
+    company_name: parsed.data.company_name,
+    attendee_count: parsed.data.attendee_count,
+  };
+  const cookieStore = await cookies();
+  const cookieToken = cookieStore.get(CHECKOUT_COOKIE_NAME)?.value;
+  const existingToken = isCheckoutToken(cookieToken) ? cookieToken : null;
+  const supabase = createSupabaseServiceClient();
+  let editableToken: string | null = null;
+
+  if (existingToken) {
+    const { data: existingApplication } = await supabase
+      .from("summit_applications")
+      .select("status, registration_type")
+      .eq("checkout_token", existingToken)
+      .maybeSingle();
+
+    if (existingApplication?.status === "payment_pending") redirect("/plans");
+    if (
+      existingApplication?.status === "details_submitted" &&
+      existingApplication.registration_type === "corporate"
+    ) {
+      editableToken = existingToken;
+    }
+  }
+
+  const { candidates, error: paidLookupError } = await loadPaidCandidates(supabase);
+  if (paidLookupError) {
+    console.error("Unable to check existing summit payment:", paidLookupError.message);
+    return {
+      message: "We could not check your payment status. Please try again.",
+      values: registration,
+    };
+  }
+
+  const matches = findPaidMatches(candidates, "", normalizedPhone(registration.phone));
+  redirectForPaidMatch(cookieStore, matches);
+  cookieStore.delete(PAID_MATCH_COOKIE_NAME);
+
+  const { data, error } = await supabase.rpc("save_summit_corporate_application", {
+    p_contact_name: registration.contact_name,
+    p_phone: registration.phone,
+    p_company_name: registration.company_name,
+    p_attendee_count: registration.attendee_count,
+    p_checkout_token: editableToken,
+  });
+
+  if (error || typeof data !== "string") {
+    console.error("Unable to save corporate summit registration:", error?.message);
+    return {
+      message: "We could not save your registration. Please try again.",
+      values: registration,
+    };
+  }
+
+  setCheckoutCookie(cookieStore, data);
   redirect("/plans");
 }

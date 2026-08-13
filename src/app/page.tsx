@@ -11,7 +11,10 @@ import {
   CHECKOUT_COOKIE_NAME,
   isCheckoutToken,
 } from "@/lib/summit/constants";
-import type { RegistrationValues } from "@/lib/summit/validation";
+import type {
+  CorporateRegistrationValues,
+  RegistrationValues,
+} from "@/lib/summit/validation";
 import { registrationValuesFromStored } from "@/lib/summit/preferences";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { redirect } from "next/navigation";
@@ -21,31 +24,44 @@ export const dynamic = "force-dynamic";
 export default async function RegistrationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mode?: string }>;
+  searchParams: Promise<{ mode?: string; registration?: string }>;
 }) {
-  const { mode } = await searchParams;
+  const { mode, registration } = await searchParams;
   const cookieStore = await cookies();
   const checkoutToken = cookieStore.get(CHECKOUT_COOKIE_NAME)?.value;
   let initialValues: Partial<RegistrationValues> | null = null;
+  let corporateInitialValues: Partial<CorporateRegistrationValues> | null = null;
+  let registrationType: "individual" | "corporate" =
+    registration === "corporate" ? "corporate" : "individual";
 
   if (isCheckoutToken(checkoutToken)) {
     const supabase = createSupabaseServiceClient();
     const { data: application } = await supabase
       .from("summit_applications")
-      .select("status")
+      .select("status, registration_type, first_name, phone, company_name, attendee_count")
       .eq("checkout_token", checkoutToken)
       .maybeSingle();
 
     if (application?.status === "payment_pending") redirect("/plans");
 
     if (application?.status === "details_submitted") {
-      const { data } = await supabase.rpc("get_summit_registration", {
-        p_checkout_token: checkoutToken,
-      });
-      initialValues =
-        Array.isArray(data) && data[0]
-          ? registrationValuesFromStored(data[0])
-          : null;
+      registrationType = application.registration_type === "corporate" ? "corporate" : "individual";
+      if (registrationType === "corporate") {
+        corporateInitialValues = {
+          contact_name: application.first_name,
+          phone: application.phone,
+          company_name: application.company_name ?? "",
+          attendee_count: application.attendee_count ?? 2,
+        };
+      } else {
+        const { data } = await supabase.rpc("get_summit_registration", {
+          p_checkout_token: checkoutToken,
+        });
+        initialValues =
+          Array.isArray(data) && data[0]
+            ? registrationValuesFromStored(data[0])
+            : null;
+      }
     }
   }
 
@@ -58,7 +74,9 @@ export default async function RegistrationPage({
             accent="attending?"
             description={
               <>
-                This is what goes on your badge. Fields marked
+                {registrationType === "corporate"
+                  ? "Register your company group with one primary contact. Fields marked"
+                  : "This is what goes on your badge. Fields marked"}
                 <span className="summit-required">*</span> are required.
               </>
             }
@@ -68,7 +86,9 @@ export default async function RegistrationPage({
           <div className="summit-panel-body">
             <RegistrationEntry
               initialValues={initialValues}
+              corporateInitialValues={corporateInitialValues}
               lookupMode={mode === "lookup"}
+              registrationType={registrationType}
             />
           </div>
         </section>

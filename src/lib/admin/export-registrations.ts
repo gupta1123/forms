@@ -78,6 +78,21 @@ export async function exportRegistrationsToExcel(
       width: 18,
     },
     {
+      header: header("Registration Type"),
+      cell: (row, rowIndex) => textCell(row.registration_type === "corporate" ? "Corporate" : "Individual", rowIndex),
+      width: 20,
+    },
+    {
+      header: header("People Attending"),
+      cell: (row, rowIndex) => ({ ...numberCell(row.attendee_count, rowIndex), format: "0" }),
+      width: 18,
+    },
+    {
+      header: header("Company Name"),
+      cell: (row, rowIndex) => textCell(row.company_name, rowIndex),
+      width: 28,
+    },
+    {
       header: header("Registered At"),
       cell: (row, rowIndex) => dateCell(row.created_at, rowIndex),
       width: 23,
