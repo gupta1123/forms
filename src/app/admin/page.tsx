@@ -40,15 +40,17 @@ export default async function AdminDashboardPage({
   return (
     <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">
       <AdminHeader email={email} />
-      <div className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:py-10">
-        <div className="mb-7">
-          <p className="text-sm font-semibold text-[var(--brass)]">
-            Industrial Summit
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-            Registrations
-          </h1>
-          <p className="mt-2 text-sm text-[var(--ink-72)]">
+      <div className="mx-auto max-w-[1360px] px-4 py-4 sm:px-6 lg:py-5">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[14px] font-semibold text-[var(--brass)]">
+              Industrial Summit
+            </p>
+            <h1 className="mt-0.5 text-3xl font-semibold tracking-[-0.035em]">
+              Registrations
+            </h1>
+          </div>
+          <p className="max-w-xl text-[15px] leading-6 text-[var(--ink-72)] sm:text-right">
             Browse the attendee list, then open a registration for its complete
             payment history.
           </p>

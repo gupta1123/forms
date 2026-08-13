@@ -60,21 +60,21 @@ export function AdminDashboard({
   });
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--ink-16)] bg-white shadow-sm">
-      <div className="border-b border-[var(--ink-16)] p-5 sm:p-6">
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+    <section className="overflow-hidden rounded-xl border border-[var(--ink-16)] bg-white shadow-sm">
+      <div className="border-b border-[var(--ink-16)] p-4">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--ink)]">
+              <h2 className="text-[20px] font-semibold leading-tight tracking-[-0.02em] text-[var(--ink)]">
                 Registration list
               </h2>
-              <p className="mt-1 text-sm text-[var(--ink-72)]">
+              <p className="mt-0.5 text-[14px] leading-5 text-[var(--ink-72)]">
                 {data.pagination.totalMatches} matching registrations ·{" "}
                 {filters.sort === "recent" ? "recent first" : "oldest first"}
               </p>
             </div>
             <button
-              className="inline-flex h-10 items-center justify-center gap-2 self-start whitespace-nowrap rounded-lg bg-[var(--navy)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--navy-deep)] disabled:cursor-wait disabled:opacity-60 lg:self-auto"
+              className="inline-flex h-9 items-center justify-center gap-2 self-start whitespace-nowrap rounded-lg bg-[var(--navy)] px-3.5 text-[15px] font-semibold text-white transition hover:bg-[var(--navy-deep)] disabled:cursor-wait disabled:opacity-60 sm:self-auto"
               disabled={exporting || data.registrations.length === 0}
               onClick={handleExport}
               type="button"
@@ -90,7 +90,7 @@ export function AdminDashboard({
 
           <form
             action="/admin"
-            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(260px,1fr)_180px_170px_160px_auto_auto]"
+            className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(280px,1fr)_150px_145px_140px_auto_auto]"
             method="get"
           >
             <label className="relative sm:col-span-2 xl:col-span-1" htmlFor="admin-search">
@@ -100,7 +100,7 @@ export function AdminDashboard({
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-48)]"
               />
               <input
-                className="field-input h-10 pl-10"
+                className="field-input h-9 pl-10 text-[15px]"
                 defaultValue={filters.search}
                 id="admin-search"
                 name="q"
@@ -112,7 +112,7 @@ export function AdminDashboard({
               Payment status
             </label>
             <select
-              className="field-input h-10"
+              className="field-input h-9 text-[15px]"
               defaultValue={filters.payment}
               id="payment-filter"
               name="payment"
@@ -126,7 +126,7 @@ export function AdminDashboard({
               Redeem-code usage
             </label>
             <select
-              className="field-input h-10"
+              className="field-input h-9 text-[15px]"
               defaultValue={filters.pricing}
               id="code-filter"
               name="pricing"
@@ -139,7 +139,7 @@ export function AdminDashboard({
               Sort order
             </label>
             <select
-              className="field-input h-10"
+              className="field-input h-9 text-[15px]"
               defaultValue={filters.sort}
               id="sort-order"
               name="sort"
@@ -148,13 +148,13 @@ export function AdminDashboard({
               <option value="oldest">Oldest first</option>
             </select>
             <button
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-[var(--navy)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--navy-deep)]"
+              className="inline-flex h-9 items-center justify-center rounded-lg bg-[var(--navy)] px-3.5 text-[15px] font-semibold text-white transition hover:bg-[var(--navy-deep)]"
               type="submit"
             >
               Apply
             </button>
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-lg border border-[var(--ink-16)] px-4 text-sm font-semibold text-[var(--ink-72)] transition hover:border-[var(--ink)] hover:text-[var(--ink)]"
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-[var(--ink-16)] px-3.5 text-[15px] font-semibold text-[var(--ink-72)] transition hover:border-[var(--ink)] hover:text-[var(--ink)]"
               href="/admin"
             >
               Clear
@@ -169,18 +169,29 @@ export function AdminDashboard({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1180px] border-collapse text-left">
+        <table className="w-full min-w-[1080px] table-fixed border-collapse text-left">
+          <colgroup>
+            <col className="w-[14%]" />
+            <col className="w-[17%]" />
+            <col className="w-[20%]" />
+            <col className="w-[9%]" />
+            <col className="w-[8%]" />
+            <col className="w-[9%]" />
+            <col className="w-[9%]" />
+            <col className="w-[10%]" />
+            <col className="w-[4%]" />
+          </colgroup>
           <thead>
-            <tr className="border-b border-[var(--ink-16)] bg-[var(--paper)] text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink-48)]">
-              <th className="px-5 py-3.5">Attendee</th>
-              <th className="px-5 py-3.5">Contact</th>
-              <th className="px-5 py-3.5">Organisation</th>
-              <th className="px-5 py-3.5">City</th>
-              <th className="px-5 py-3.5">Pricing</th>
-              <th className="px-5 py-3.5">Amount</th>
-              <th className="px-5 py-3.5">Payment</th>
-              <th className="px-5 py-3.5">Registered</th>
-              <th className="px-5 py-3.5 text-right">Details</th>
+            <tr className="border-b border-[var(--ink-16)] bg-[var(--paper)] text-[12px] font-semibold uppercase tracking-[0.07em] text-[var(--ink-48)]">
+              <th className="px-3 py-2.5">Attendee</th>
+              <th className="px-3 py-2.5">Contact</th>
+              <th className="px-3 py-2.5">Organisation</th>
+              <th className="px-3 py-2.5">City</th>
+              <th className="px-3 py-2.5">Pricing</th>
+              <th className="px-3 py-2.5">Amount</th>
+              <th className="px-3 py-2.5">Payment</th>
+              <th className="px-3 py-2.5">Registered</th>
+              <th className="px-3 py-2.5 text-right">Details</th>
             </tr>
           </thead>
           <tbody>
@@ -204,8 +215,8 @@ export function AdminDashboard({
         </table>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-[var(--ink-16)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-[var(--ink-48)]">
+      <div className="flex flex-col gap-3 border-t border-[var(--ink-16)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[14px] text-[var(--ink-48)]">
           Showing {data.registrations.length} on this page ·{" "}
           {data.pagination.totalMatches} total matches
         </p>
@@ -238,41 +249,41 @@ function RegistrationRow({ registration }: { registration: AdminRegistration }) 
   const detailHref = `/admin/${registration.application_id}`;
 
   return (
-    <tr className="border-b border-[var(--ink-16)] align-top text-sm last:border-0 hover:bg-[var(--paper)]">
-      <td className="px-5 py-4">
+    <tr className="border-b border-[var(--ink-16)] align-top text-[15px] leading-5 last:border-0 hover:bg-[var(--paper)]">
+      <td className="px-3 py-3">
         <Link className="font-semibold text-[var(--ink)] hover:text-[var(--brass)]" href={detailHref}>
           {registration.first_name} {registration.last_name}
         </Link>
-        <p className="mt-1 font-mono text-[11px] text-[var(--ink-48)]">
+        <p className="mt-0.5 font-mono text-[12px] text-[var(--ink-48)]">
           IS-{String(registration.application_id).padStart(6, "0")}
         </p>
-        <p className="mt-1 text-xs font-semibold capitalize text-[var(--brass)]">
+        <p className="mt-0.5 text-[13px] font-semibold capitalize text-[var(--brass)]">
           {registration.registration_type} · {registration.attendee_count} {registration.attendee_count === 1 ? "person" : "people"}
         </p>
       </td>
-      <td className="px-5 py-4 text-[var(--ink-72)]">
-        <p>{registration.email ?? "No email collected"}</p>
-        <p className="mt-1">{registration.phone}</p>
+      <td className="break-words px-3 py-3 text-[var(--ink-72)]">
+        <p className="break-all">{registration.email ?? "No email collected"}</p>
+        <p className="mt-0.5">{registration.phone}</p>
       </td>
-      <td className="px-5 py-4">
+      <td className="break-words px-3 py-3">
         <p className="font-medium text-[var(--ink)]">{registration.company_name ?? registration.profession}</p>
-        <p className="mt-1 text-[var(--ink-72)]">
+        <p className="mt-0.5 text-[var(--ink-72)]">
           {registration.registration_type === "corporate"
             ? "Corporate registration"
             : `${registration.designation} · ${registration.industry}`}
         </p>
       </td>
-      <td className="px-5 py-4 text-[var(--ink-72)]">{registration.place}</td>
-      <td className="px-5 py-4">
+      <td className="break-words px-3 py-3 text-[var(--ink-72)]">{registration.place}</td>
+      <td className="px-3 py-3">
         {registration.redeem_code ? (
           <span className="rounded-full bg-[var(--paper-deep)] px-2.5 py-1 text-xs font-semibold text-[var(--navy)]">
             {registration.redeem_code}
           </span>
         ) : (
-          <span className="text-xs text-[var(--ink-48)]">Standard</span>
+          <span className="text-[13px] text-[var(--ink-48)]">Standard</span>
         )}
       </td>
-      <td className="px-5 py-4">
+      <td className="whitespace-nowrap px-3 py-3">
         <p className="font-semibold text-[var(--ink)]">
           {formatRupees(registration.amount_due_paise)}
         </p>
@@ -282,16 +293,16 @@ function RegistrationRow({ registration }: { registration: AdminRegistration }) 
           </p>
         )}
       </td>
-      <td className="px-5 py-4">
+      <td className="px-3 py-3">
         <PaymentBadge mode={registration.payment_mode} status={registration.payment_status} />
       </td>
-      <td className="px-5 py-4 text-xs leading-5 text-[var(--ink-72)]">
+      <td className="px-3 py-3 text-[13px] leading-[1.35] text-[var(--ink-72)]">
         {formatDate(registration.created_at)}
       </td>
-      <td className="px-5 py-4 text-right">
+      <td className="px-3 py-3 text-right">
         <Link
           aria-label={`View ${registration.first_name}`}
-          className="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--ink-16)] text-[var(--navy)] transition hover:border-[var(--navy)] hover:bg-[var(--paper-deep)]"
+          className="inline-flex size-8 items-center justify-center rounded-lg border border-[var(--ink-16)] text-[var(--navy)] transition hover:border-[var(--navy)] hover:bg-[var(--paper-deep)]"
           href={detailHref}
         >
           <PiEye aria-hidden="true" />
