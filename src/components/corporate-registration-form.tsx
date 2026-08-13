@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { PiArrowRight, PiInfo } from "react-icons/pi";
 
 import {
@@ -30,8 +30,6 @@ export function CorporateRegistrationForm({
     initialState,
   );
   const values = { ...emptyValues, ...initialValues, ...state.values };
-  const [attendeeCount, setAttendeeCount] = useState(values.attendee_count);
-
   return (
     <form action={formAction} noValidate>
       {state.message && (
@@ -41,7 +39,7 @@ export function CorporateRegistrationForm({
       )}
 
       <div
-        className="mb-7 flex items-start gap-3.5 rounded-[6px] bg-[var(--paper-deep)] px-[15px] py-2.5 text-[13px] leading-5 text-[var(--ink)]"
+        className="mb-7 flex items-start gap-3.5 rounded-[6px] bg-[var(--paper-deep)] px-[15px] py-2.5 text-[15px] leading-6 text-[var(--ink)]"
         data-testid="corporate-terms"
       >
         <PiInfo className="shrink-0 text-sm text-[var(--brass)]" aria-hidden="true" />
@@ -49,12 +47,6 @@ export function CorporateRegistrationForm({
           <li>One registration per company</li>
           <li className="flex items-center gap-3.5 before:size-[3px] before:shrink-0 before:rounded-full before:bg-[var(--brass)] before:opacity-50">
             <span>Minimum <b className="font-semibold text-[var(--navy)]">2</b> people</span>
-          </li>
-          <li className="flex items-center gap-3.5 before:size-[3px] before:shrink-0 before:rounded-full before:bg-[var(--brass)] before:opacity-50">
-            <span>
-              <b className="font-semibold text-[var(--navy)]">{attendeeCount >= 2 ? attendeeCount : 2}</b>{" "}
-              passes at the full price — redeem codes don&apos;t apply
-            </span>
           </li>
         </ul>
       </div>
@@ -102,10 +94,6 @@ export function CorporateRegistrationForm({
             label="Number of people"
             min={2}
             name="attendee_count"
-            onChange={(event) => {
-              const count = Number.parseInt(event.target.value, 10);
-              setAttendeeCount(Number.isFinite(count) ? count : 2);
-            }}
             placeholder="2"
             step={1}
             type="number"
@@ -144,7 +132,6 @@ function CorporateField({
   label,
   min,
   name,
-  onChange,
   placeholder,
   step,
   type = "text",
@@ -156,7 +143,6 @@ function CorporateField({
   label: string;
   min?: number;
   name: keyof CorporateRegistrationValues;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
   placeholder: string;
   step?: number;
   type?: string;
@@ -175,7 +161,6 @@ function CorporateField({
         id={name}
         min={min}
         name={name}
-        onChange={onChange}
         placeholder={placeholder}
         required
         step={step}
