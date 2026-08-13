@@ -32,36 +32,34 @@ export function RegistrationEntry({
 
   return (
     <>
-      <div className="mb-8 flex flex-col gap-4 border border-[var(--ink-16)] bg-[var(--paper-deep)] p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-semibold text-[var(--navy)]">
-            Have you already registered and paid?
-          </p>
-          <p className="mt-1 text-sm leading-6 text-[var(--ink-72)]">
-            Check your registration before submitting a new payment.
-          </p>
-        </div>
+      <div className="mb-5 flex justify-end">
         <Link
-          className="button-secondary inline-flex h-11 shrink-0 items-center justify-center gap-2 px-5"
+          className="inline-flex items-center gap-2 border-b border-[rgb(13_161_167_/_35%)] pb-0.5 text-[13.5px] font-semibold text-[var(--brass)] transition hover:border-[var(--navy)] hover:text-[var(--navy)]"
+          data-testid="registration-lookup-link"
           href="/?mode=lookup"
         >
           <PiMagnifyingGlass aria-hidden="true" />
-          Already registered?
+          Already registered? Check your pass
         </Link>
       </div>
 
-      <div className="mb-8 grid gap-3 sm:grid-cols-2" aria-label="Registration type">
+      <div
+        aria-label="Registration type"
+        className="mb-3 grid gap-2.5 sm:grid-cols-2"
+        data-testid="registration-type-tabs"
+        role="radiogroup"
+      >
         <RegistrationTypeLink
           active={registrationType === "individual"}
-          description="Register one attendee with the existing full form."
+          description="One attendee, one pass"
           href="/?registration=individual"
-          title="Individual registration"
+          title="Individual"
         />
         <RegistrationTypeLink
           active={registrationType === "corporate"}
-          description="Register a company group of two or more people."
+          description="Two or more from one company"
           href="/?registration=corporate"
-          title="Corporate registration"
+          title="Corporate"
         />
       </div>
 
@@ -87,17 +85,29 @@ function RegistrationTypeLink({
 }) {
   return (
     <Link
-      aria-current={active ? "page" : undefined}
-      className={`border p-5 transition ${
+      aria-checked={active}
+      className={`flex min-h-[70px] items-center gap-3 rounded-[6px] border px-[15px] py-[13px] text-left transition hover:-translate-y-px hover:border-[var(--brass)] ${
         active
           ? "border-[var(--navy)] bg-[var(--navy)] text-white"
-          : "border-[var(--ink-16)] bg-white text-[var(--ink)] hover:border-[var(--navy)]"
+          : "border-[var(--ink-16)] bg-white text-[var(--ink)]"
       }`}
       href={href}
+      role="radio"
+      tabIndex={active ? 0 : -1}
     >
-      <span className="font-semibold">{title}</span>
-      <span className={`mt-1 block text-sm leading-6 ${active ? "text-white/75" : "text-[var(--ink-72)]"}`}>
-        {description}
+      <span
+        aria-hidden="true"
+        className={`grid size-[17px] shrink-0 place-items-center rounded-full border-[1.5px] ${active ? "border-white/85" : "border-[var(--ink-16)]"}`}
+      >
+        <span className={`size-2 rounded-full ${active ? "bg-white" : "bg-transparent"}`} />
+      </span>
+      <span className="grid min-w-0 gap-0.5">
+        <span className={`text-[15px] font-semibold leading-tight ${active ? "text-white" : "text-[var(--navy)]"}`}>
+          {title}
+        </span>
+        <span className={`text-[12.5px] leading-[1.35] ${active ? "text-white/70" : "text-[var(--ink-48)]"}`}>
+          {description}
+        </span>
       </span>
     </Link>
   );

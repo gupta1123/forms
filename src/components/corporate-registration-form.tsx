@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { PiArrowRight, PiBuildings, PiUsersThree } from "react-icons/pi";
+import { useActionState, useState } from "react";
+import { PiArrowRight, PiInfo } from "react-icons/pi";
 
 import {
   submitCorporateRegistration,
@@ -30,6 +30,7 @@ export function CorporateRegistrationForm({
     initialState,
   );
   const values = { ...emptyValues, ...initialValues, ...state.values };
+  const [attendeeCount, setAttendeeCount] = useState(values.attendee_count);
 
   return (
     <form action={formAction} noValidate>
@@ -39,21 +40,23 @@ export function CorporateRegistrationForm({
         </div>
       )}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2">
-        <div className="border border-[var(--ink-16)] bg-[var(--paper-deep)] p-5">
-          <PiBuildings className="text-2xl text-[var(--brass)]" aria-hidden="true" />
-          <p className="mt-3 font-semibold text-[var(--navy)]">One company registration</p>
-          <p className="mt-1 text-sm leading-6 text-[var(--ink-72)]">
-            Add the main contact and the total number of people attending.
-          </p>
-        </div>
-        <div className="border border-[var(--ink-16)] bg-[var(--paper-deep)] p-5">
-          <PiUsersThree className="text-2xl text-[var(--brass)]" aria-hidden="true" />
-          <p className="mt-3 font-semibold text-[var(--navy)]">Minimum 2 people</p>
-          <p className="mt-1 text-sm leading-6 text-[var(--ink-72)]">
-            The total is calculated at the full pass price for every attendee.
-          </p>
-        </div>
+      <div
+        className="mb-7 flex items-start gap-3.5 rounded-[6px] bg-[var(--paper-deep)] px-[15px] py-2.5 text-[13px] leading-5 text-[var(--ink)]"
+        data-testid="corporate-terms"
+      >
+        <PiInfo className="shrink-0 text-sm text-[var(--brass)]" aria-hidden="true" />
+        <ul className="flex min-w-0 flex-wrap gap-x-3.5 gap-y-1.5">
+          <li>One registration per company</li>
+          <li className="flex items-center gap-3.5 before:size-[3px] before:shrink-0 before:rounded-full before:bg-[var(--brass)] before:opacity-50">
+            <span>Minimum <b className="font-semibold text-[var(--navy)]">2</b> people</span>
+          </li>
+          <li className="flex items-center gap-3.5 before:size-[3px] before:shrink-0 before:rounded-full before:bg-[var(--brass)] before:opacity-50">
+            <span>
+              <b className="font-semibold text-[var(--navy)]">{attendeeCount >= 2 ? attendeeCount : 2}</b>{" "}
+              passes at the full price — redeem codes don&apos;t apply
+            </span>
+          </li>
+        </ul>
       </div>
 
       <fieldset className="summit-fieldset">
@@ -99,6 +102,10 @@ export function CorporateRegistrationForm({
             label="Number of people"
             min={2}
             name="attendee_count"
+            onChange={(event) => {
+              const count = Number.parseInt(event.target.value, 10);
+              setAttendeeCount(Number.isFinite(count) ? count : 2);
+            }}
             placeholder="2"
             step={1}
             type="number"
@@ -137,6 +144,7 @@ function CorporateField({
   label,
   min,
   name,
+  onChange,
   placeholder,
   step,
   type = "text",
@@ -148,6 +156,7 @@ function CorporateField({
   label: string;
   min?: number;
   name: keyof CorporateRegistrationValues;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
   placeholder: string;
   step?: number;
   type?: string;
@@ -166,6 +175,7 @@ function CorporateField({
         id={name}
         min={min}
         name={name}
+        onChange={onChange}
         placeholder={placeholder}
         required
         step={step}
