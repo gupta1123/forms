@@ -16,14 +16,16 @@
   --ink-16: rgb(9 60 84 / 16%);
   --background: var(--paper);
   --foreground: var(--ink);
+  --font-hanken-grotesk: var(--font-instrument-serif);
+  --font-jetbrains-mono: var(--font-instrument-serif);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-hanken-grotesk);
+  --font-sans: var(--font-instrument-serif);
   --font-serif: var(--font-instrument-serif);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-mono: var(--font-instrument-serif);
 }
 
 * {
@@ -38,7 +40,7 @@ html {
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-hanken-grotesk), "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-instrument-serif), Georgia, serif;
   font-size: 16.5px;
   line-height: 1.68;
   overflow-x: clip;
