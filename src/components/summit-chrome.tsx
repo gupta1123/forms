@@ -28,10 +28,10 @@ export function SummitHeader({
             <Image
               alt="Industrial Summit"
               className="summit-brand-logo"
-              height={660}
+              height={1660}
               priority
-              src="/industrial-summit-logo.png"
-              width={2616}
+              src="/industrial-summit-logo-v2.png"
+              width={4146}
             />
           </Link>
           {greeting && (
