@@ -138,3 +138,28 @@ export type AdminRegistrationDetail = {
   payment_orders: AdminPaymentOrder[];
   email_deliveries: AdminEmailDelivery[];
 };
+
+export type PrivateAdminRegistration = {
+  id: number;
+  submission_token: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email: string;
+  industry: string;
+  profession: string;
+  designation: string;
+  place: string;
+  participation_purpose: string;
+  summit_expectations: string | null;
+  source: "private_link";
+  created_at: string;
+  updated_at: string;
+};
+
+export type PrivateAdminFilters = {
+  search: string;
+  sort: "recent" | "oldest";
+  cursor: number | null;
+  direction: "next" | "previous";
+};

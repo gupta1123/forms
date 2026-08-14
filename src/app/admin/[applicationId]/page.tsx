@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { AdminHeader } from "@/components/admin-header";
+import { AdminNavigation } from "@/components/admin-navigation";
 import { AdminRegistrationDetail } from "@/components/admin-registration-detail";
 import { requireSummitAdmin } from "@/lib/admin/access";
 import { getAdminRegistrationDetail } from "@/lib/admin/data";
@@ -23,8 +24,9 @@ export default async function AdminRegistrationPage({
   return (
     <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">
       <AdminHeader email={email} />
-      <div className="mx-auto max-w-[1320px] px-5 py-8 sm:px-8 lg:py-10">
-        <AdminRegistrationDetail detail={detail} />
+      <div className="mx-auto grid max-w-[1440px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[210px_minmax(0,1fr)] lg:py-5">
+        <AdminNavigation active="paid" />
+        <div className="min-w-0"><AdminRegistrationDetail detail={detail} /></div>
       </div>
     </main>
   );

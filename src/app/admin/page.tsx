@@ -1,5 +1,6 @@
 import { AdminDashboard } from "@/components/admin-dashboard";
 import { AdminHeader } from "@/components/admin-header";
+import { AdminNavigation } from "@/components/admin-navigation";
 import { requireSummitAdmin } from "@/lib/admin/access";
 import { getAdminRegistrationPage } from "@/lib/admin/data";
 import type {
@@ -40,8 +41,10 @@ export default async function AdminDashboardPage({
   return (
     <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">
       <AdminHeader email={email} />
-      <div className="mx-auto max-w-[1360px] px-4 py-4 sm:px-6 lg:py-5">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto grid max-w-[1440px] gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[210px_minmax(0,1fr)] lg:py-5">
+        <AdminNavigation active="paid" />
+        <div className="min-w-0">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[14px] font-semibold text-[var(--brass)]">
               Industrial Summit
@@ -54,8 +57,9 @@ export default async function AdminDashboardPage({
             Browse the attendee list, then open a registration for its complete
             payment history.
           </p>
+          </div>
+          <AdminDashboard data={dashboardData} filters={filters} />
         </div>
-        <AdminDashboard data={dashboardData} filters={filters} />
       </div>
     </main>
   );
