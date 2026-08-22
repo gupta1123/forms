@@ -60,3 +60,18 @@ export async function getPrivateRegistrationDetail(id: number) {
   if (error) throw new Error("The private registration could not be loaded.");
   return (data as PrivateAdminRegistration | null) ?? null;
 }
+
+export async function getPrivateRegistrationExportRows() {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("summit_private_registrations")
+    .select(columns)
+    .order("id", { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    throw new Error("The private registration export could not be loaded.");
+  }
+
+  return (data ?? []) as PrivateAdminRegistration[];
+}

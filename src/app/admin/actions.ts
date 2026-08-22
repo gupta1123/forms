@@ -8,9 +8,12 @@ import { createAdminAuthClient } from "@/lib/supabase/admin-server";
 import type {
   AdminListFilters,
   AdminRegistration,
+  PrivateAdminFilters,
+  PrivateAdminRegistration,
 } from "@/lib/admin/types";
 import { decodeSummitPreferences } from "@/lib/summit/preferences";
 import { getAdminRegistrationExportRows } from "@/lib/admin/data";
+import { getPrivateRegistrationExportRows } from "@/lib/admin/private-data";
 
 const adminLoginSchema = z.object({
   identifier: z.string().trim().min(1, "Enter your username or email."),
@@ -21,6 +24,11 @@ const exportFiltersSchema = z.object({
   search: z.string().trim().max(80),
   payment: z.enum(["all", "awaiting", "paid", "cancelled"]),
   pricing: z.enum(["all", "redeemed", "standard"]),
+  sort: z.enum(["recent", "oldest"]),
+});
+
+const privateExportFiltersSchema = z.object({
+  search: z.string().trim().max(80),
   sort: z.enum(["recent", "oldest"]),
 });
 
@@ -172,6 +180,53 @@ export async function getAdminRegistrationExport(
     })
     .sort((left, right) => {
       const difference = left.application_id - right.application_id;
+      return filters.sort === "recent" ? -difference : difference;
+    });
+}
+
+export async function getPrivateRegistrationExport(
+  input: Pick<PrivateAdminFilters, "search" | "sort">,
+) {
+  const filters = privateExportFiltersSchema.parse(input);
+  const supabase = await createAdminAuthClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+
+  if (!claimsData?.claims?.sub) {
+    throw new Error("Your administrator session has expired.");
+  }
+
+  const { data: isAdmin, error: accessError } = await supabase.rpc(
+    "is_summit_admin",
+  );
+  if (accessError || !isAdmin) {
+    throw new Error("Administrator access is required.");
+  }
+
+  const registrations: PrivateAdminRegistration[] =
+    await getPrivateRegistrationExportRows();
+  const normalisedSearch = filters.search.toLowerCase();
+
+  return registrations
+    .filter((registration) => {
+      const matchesSearch =
+        !normalisedSearch ||
+        [
+          registration.first_name,
+          registration.last_name,
+          registration.email,
+          registration.phone,
+          registration.industry,
+          registration.profession,
+          registration.designation,
+          registration.place,
+          registration.participation_purpose,
+          registration.summit_expectations ?? "",
+        ].some((value) => value.toLowerCase().includes(normalisedSearch));
+
+      return matchesSearch;
+    })
+    .sort((left, right) => {
+      const difference = left.id - right.id;
       return filters.sort === "recent" ? -difference : difference;
     });
 }

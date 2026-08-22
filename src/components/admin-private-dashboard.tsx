@@ -1,6 +1,18 @@
-import Link from "next/link";
-import { PiArrowLeft, PiArrowRight, PiEye, PiMagnifyingGlass } from "react-icons/pi";
+"use client";
 
+import Link from "next/link";
+import { useState } from "react";
+import {
+  PiArrowLeft,
+  PiArrowRight,
+  PiDownloadSimple,
+  PiEye,
+  PiMagnifyingGlass,
+  PiSpinnerGap,
+} from "react-icons/pi";
+
+import { getPrivateRegistrationExport } from "@/app/admin/actions";
+import { exportPrivateRegistrationsToExcel } from "@/lib/admin/export-private-registrations";
 import type { AdminPagination, PrivateAdminFilters, PrivateAdminRegistration } from "@/lib/admin/types";
 
 export function AdminPrivateDashboard({ registrations, pagination, filters }: {
@@ -8,13 +20,48 @@ export function AdminPrivateDashboard({ registrations, pagination, filters }: {
   pagination: AdminPagination;
   filters: PrivateAdminFilters;
 }) {
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+
+  async function handleExport() {
+    setExporting(true);
+    setExportError("");
+
+    try {
+      const exportRows = await getPrivateRegistrationExport({
+        search: filters.search,
+        sort: filters.sort,
+      });
+      await exportPrivateRegistrationsToExcel(exportRows);
+    } catch {
+      setExportError("The Excel file could not be created. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <section className="overflow-hidden rounded-xl border border-[var(--ink-16)] bg-white shadow-sm">
       <div className="border-b border-[var(--ink-16)] p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-[20px] font-semibold tracking-[-0.02em]">Private registration list</h2>
-            <p className="mt-0.5 text-[14px] text-[var(--ink-72)]">{pagination.totalMatches} link-only submissions · {filters.sort === "recent" ? "recent first" : "oldest first"}</p>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-[20px] font-semibold tracking-[-0.02em]">Private registration list</h2>
+              <p className="mt-0.5 text-[14px] text-[var(--ink-72)]">{pagination.totalMatches} link-only submissions · {filters.sort === "recent" ? "recent first" : "oldest first"}</p>
+            </div>
+            <button
+              className="inline-flex h-9 items-center justify-center gap-2 self-start whitespace-nowrap rounded-lg bg-[var(--navy)] px-3.5 text-[15px] font-semibold text-white transition hover:bg-[var(--navy-deep)] disabled:cursor-wait disabled:opacity-60 sm:self-auto"
+              disabled={exporting || registrations.length === 0}
+              onClick={handleExport}
+              type="button"
+            >
+              {exporting ? (
+                <PiSpinnerGap aria-hidden="true" className="animate-spin" />
+              ) : (
+                <PiDownloadSimple aria-hidden="true" />
+              )}
+              {exporting ? "Preparing..." : "Export Excel"}
+            </button>
           </div>
           <form action="/admin/private" className="grid gap-2 sm:grid-cols-[minmax(240px,1fr)_130px_auto_auto]" method="get">
             <label className="relative" htmlFor="private-search">
@@ -30,6 +77,11 @@ export function AdminPrivateDashboard({ registrations, pagination, filters }: {
             <button className="inline-flex h-9 items-center justify-center rounded-lg bg-[var(--navy)] px-3.5 text-[15px] font-semibold text-white" type="submit">Apply</button>
             <Link className="inline-flex h-9 items-center justify-center rounded-lg border border-[var(--ink-16)] px-3.5 text-[15px] font-semibold text-[var(--ink-72)]" href="/admin/private">Clear</Link>
           </form>
+          {exportError && (
+            <p className="text-sm text-[#a8422c]" role="alert">
+              {exportError}
+            </p>
+          )}
         </div>
       </div>
 
